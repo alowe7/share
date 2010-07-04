@@ -1,5 +1,5 @@
 (put 'other 'rcsid
- "$Id: other.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id: other.el,v 1.2 2010-07-04 22:43:37 alowe Exp $")
 
 (defun other-lastline (&optional p) 
   (cond ((< p (point-max))
@@ -77,11 +77,15 @@ else returns `buffer-file-name'
 	    (not (file-exists-p target))
 
 	    (let ((ret (y-or-n-q-p (format "file %s exists.  overwrite?" target) "!")))
-	      (if (eq ret ?!) (setq force t))
-	      (if (eq ret ?q) (setq bail t))
-	      (if (eq ret ?y) (setq force1 t))
-	      (or force force1)))
+	      
+	      (cond
+	       ((eq ret ?!) (setq force t))
+	       ((eq ret ?q) (setq bail t))
+	       (ret (setq force1 t)))
 
+	      (or force force1)
+	      )
+	    )
 
 	(cond ((file-directory-p f)
 	       (shell-command (concat "cp -r \"" f "\" " obd)))
