@@ -1,8 +1,9 @@
 (put 'roll 'rcsid 
- "$Id: roll.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id: roll.el,v 1.2 2010-09-30 00:05:01 keystone Exp $")
 (provide 'roll)
 (require 'buffers)
 (require 'cl)
+(require 'completion)
 
 (defmacro roll (l)
   "destructively roll LIST as a ring"
