@@ -1,5 +1,5 @@
 (put 'completion 'rcsid
- "$Id: completion.el,v 1.2 2010-10-02 21:35:16 keystone Exp $")
+ "$Id$")
 
 (defmacro complete*  (prompt &optional pat default)
   "read a symbol with completion.

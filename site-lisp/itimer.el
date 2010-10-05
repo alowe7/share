@@ -1,5 +1,5 @@
 (put 'itimer 'rcsid 
- "$Id: itimer.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 ;;; Interval timers for GNU Emacs
 ;;; Copyright (C) 1988, 1991, 1993, 1997 Kyle E. Jones
 ;;;

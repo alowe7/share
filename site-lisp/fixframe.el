@@ -1,5 +1,5 @@
 (put 'fixframe 'rcsid
- "$Id: fixframe.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (defun fixed-font ()
   (if (and (eq window-system 'x) (fboundp 'x-list-fonts))

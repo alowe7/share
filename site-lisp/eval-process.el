@@ -1,5 +1,5 @@
 (put 'eval-process 'rcsid 
- "$Id: eval-process.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 ;; a package to return process evaulation as a string
 
 (require 'zap)

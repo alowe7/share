@@ -1,5 +1,5 @@
 (put 'whencepath 'rcsid 
- "$Id: whencepath.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 (require 'sh)
 (require 'cat-utils)
 (require 'cl)

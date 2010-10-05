@@ -1,5 +1,5 @@
 (put 'scratch-mode 'rcsid
- "$Id: scratch-mode.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (require 'ctl-ret)
 (require 'buff)

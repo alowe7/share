@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2010-10-02 21:35:16 keystone Exp $
+# $Id$
 
 VERSION = 1.0
 

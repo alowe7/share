@@ -1,5 +1,5 @@
 (put 'ctl-ret 'rcsid
- "$Id: ctl-ret.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (unless (fboundp 'ctl-RET-prefix) 
     (define-prefix-command 'ctl-RET-prefix))

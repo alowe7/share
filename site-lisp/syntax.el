@@ -1,5 +1,5 @@
 (put 'syntax 'rcsid
- "$Id: syntax.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (defun modify-syntax (arg)
   (interactive "P")

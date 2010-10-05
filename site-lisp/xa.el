@@ -1,5 +1,5 @@
 (put 'xa 'rcsid
- "$Id: xa.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (define-derived-mode xa-mode fundamental-mode "xa" "")
 

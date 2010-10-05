@@ -1,5 +1,5 @@
 (put 'roll 'rcsid 
- "$Id: roll.el,v 1.2 2010-09-30 00:05:01 keystone Exp $")
+ "$Id$")
 (provide 'roll)
 (require 'buffers)
 (require 'cl)

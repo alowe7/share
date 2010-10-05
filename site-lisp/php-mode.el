@@ -1,5 +1,5 @@
 (put 'php-mode 'rcsid
- "$Id: php-mode.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (define-derived-mode php-mode java-mode "PHP" "")
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))

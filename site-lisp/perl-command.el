@@ -1,5 +1,5 @@
 (put 'perl-command 'rcsid
- "$Id: perl-command.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 ; facilitate running perl commands
 (require 'cl)
 (require 'zap)

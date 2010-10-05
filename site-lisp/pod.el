@@ -1,5 +1,5 @@
 (put 'pod 'rcsid
- "$Id: pod.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 ; functions to facilitate using pod from emacs
 

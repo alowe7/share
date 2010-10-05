@@ -1,5 +1,5 @@
 (put 'long-comment 'rcsid 
- "$Id: long-comment.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 (provide 'long-comment)
 
 (defmacro long-comment (&rest args) "long comment: ignore all arguments unevaluated" nil)

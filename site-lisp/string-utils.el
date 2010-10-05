@@ -1,5 +1,5 @@
 (put 'string-utils 'rcsid
- "$Id: string-utils.el,v 1.1 2010-04-17 17:55:03 keystone Exp $")
+ "$Id$")
 
 (defun string^ (s pat)
   "perform exclusive or of STRING with PAT."

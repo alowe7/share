@@ -1,5 +1,5 @@
 (put 'other 'rcsid
- "$Id: other.el,v 1.2 2010-07-04 22:43:37 alowe Exp $")
+ "$Id$")
 
 (defun other-lastline (&optional p) 
   (cond ((< p (point-max))
