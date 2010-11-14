@@ -1,6 +1,7 @@
 (put 'nums 'rcsid 
  "$Id$")
-(provide 'nums)
+
+(require 'eval-process)
 
 (defun exp (n m)
   " compute n ** m "
@@ -18,7 +19,7 @@
   " convert integer arg S as hex formatted string
 S may also be a string representation of a decimal number "
   (interactive "sdecimal number: ")
-  (let ((h (format "0x%0x" (if (integerp s) s (string-to-int s)))))
+  (let ((h (format "0x%0x" (if (integerp s) s (string-to-number s)))))
     (if (interactive-p) 
 	(message h) h))
 )
@@ -165,7 +166,7 @@ ZEROS if set, line number includes leading zeros
 
       (while (< i z)
 	(insert (concat (format iformat i) separator)) 
-	(next-line 1)
+	(forward-line 1)
 	(setq i (1+ i))
 	)
       )
@@ -177,7 +178,9 @@ ZEROS if set, line number includes leading zeros
 
   (interactive "r")
 
-  (replace-regexp "[0-9]+\\)\\.? ?" "" t beg end)
+  (goto-char beg)
+  (while (re-search-forward  "[0-9]+\\)\\.? ?" end t)
+    (replace-match "" nil nil))
 
   )
 
@@ -198,16 +201,6 @@ with arg, use region."
     (while l (setq s2 (concat (pop l) s2)))
     (message s2)))
 
-(defun ief ()
-"(eval-process "a2f" (indicated-word))"
-  (interactive)
-  (let ((x (clean-string (eval-process "a2f" (indicated-word)))))
-    (if buffer-read-only
-	(message x)
-	(save-excursion
-	  (end-of-line)
-	  (insert (format "		# %s" x))))))
-
 (if (boundp 'shell-mode-map)
 (define-key shell-mode-map "a" 'ascii-word))
 
@@ -222,3 +215,5 @@ with arg, use region."
 
 ; (loop for x in  (parse-rgb "#F5E39E") do (insert (format "%d " x)))
 ; 245 227 158 
+
+(provide 'nums)

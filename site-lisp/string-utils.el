@@ -10,9 +10,9 @@
 
 (defun string& (s pat)
   "append STRING by PAT, unless already there."
-  (unless (string-match pat s)
-    (concat s pat)
-    s)
+  (cond
+   ((string-match (concat pat "$") s) s)
+   (t (concat s pat)))
   )
 
 ;; xxx move to trim.el
@@ -28,28 +28,30 @@ returns result;
   (cond 
    ((stringp target)
     (let (prev)
-      (apply 'concat (remove nil (loop for x across target 
-				       collect
-				       (prog1
-					   (if (and 
-						(assoc x trmap) 
-						(not (and prev (char-equal prev ?\\ )))
-						)
-					       (cadr (assoc x trmap))
-					     (format "%c" x))
-					 (setq prev x)
-					 )
-				       )
+      (apply 'concat 
+	     (remove nil 
+		     (loop for x across target 
+			   collect
+			   (prog1
+			       (if (and 
+				    (assoc x trmap) 
+				    (not (and prev (char-equal prev ?\\ )))
+				    )
+				   (cadr (assoc x trmap))
+				 (format "%c" x))
+			     (setq prev x)
 			     )
+			   )
+		     )
 	     )
       ))
    ((buffer-live-p target)
-    (save-excursion
-      (set-buffer target)
-        (loop for x in trmap
+    (with-current-buffer target
+      (loop for x in trmap
 	    do
 	    (goto-char (point-min))
-	    (replace-string (format "%c" (car x)) (cadr x) )
+	    (while (search-forward (format "%c" (car x)) nil t)
+	      (replace-match (cadr x) nil t))
 	    )
       (buffer-string)
       ))

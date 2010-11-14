@@ -1,9 +1,9 @@
 (put 'perl-command 'rcsid
  "$Id$")
+
 ; facilitate running perl commands
 (require 'cl)
-(require 'zap)
-(require `backquote)
+(require 'eval-process)
 
 (defvar semicolon (read "?;"))
 
@@ -46,8 +46,16 @@ if LIST is specified, it is used instead of default PATH
 
 
 (defun get-buffer-create-1 (bn &optional dir)
-  (zap-buffer bn `(lambda () (cd ,dir)))
+  (let ((b (get-buffer-create bn)))
+    (with-current-buffer b
+      (erase-buffer)
+      (when dir (setq default-directory dir))
+      )
+    b
+    )
   )
+; (get-buffer-create-1 "boo" "/")
+; (get-buffer-create-1 "boo")
 
 (defun* perl-command-1 (s &key show args)
   " run perl script S on ARGS
@@ -71,19 +79,20 @@ args is a list with car = 'eval
 		(cond ((and (listp args) (eq (car args) 'eval) (list (eval args))))
 		       ((listp args) args)
 		       (t (list args)))))
-	(cond ((eq show 'eval)
-	       (set-buffer b)
-	       (read (buffer-string)))
-	      ((eq show 'split)
-	       (set-buffer b)
-	       (split (buffer-string) " 	
-"))
-	      (show (pop-to-buffer b)
-		    (beginning-of-buffer))
-	      (t
-	       (set-buffer b)
-	       (buffer-string))
-	      )
+	(cond 
+	 ((eq show 'eval)
+	  (with-current-buffer b
+	    (read (buffer-string))))
+	 ((eq show 'split)
+	  (with-current-buffer b
+	    (split (buffer-string) " 	
+")))
+	 (show (pop-to-buffer b)
+	       (goto-char (point-min)))
+	 (t
+	  (with-current-buffer b
+	    (buffer-string)))
+	 )
 	)
       )
     )
@@ -108,19 +117,23 @@ args is a list with car = 'eval
 	      (cond ((and (listp args) (eq (car args) 'eval) (list (eval args))))
 		    ((listp args) args)
 		    (t (list args)))))
-      (cond ((eq show 'eval)
-	     (set-buffer b)
-	     (read (buffer-string)))
-	    ((eq show 'split)
-	     (set-buffer b)
-	     (split (buffer-string) "[ 	
-]"))
-	    (show (pop-to-buffer b)
-		  (beginning-of-buffer))
-	    (t
-	     (set-buffer b)
-	     (buffer-string))
-	    )
+      (cond 
+       ((eq show 'eval)
+	(with-current-buffer b
+	  (read (buffer-string))))
+       ((eq show 'split)
+	(with-current-buffer b
+	  (split (buffer-string) "[ 	
+]")))
+       (show 
+	(with-current-buffer b
+	  (goto-char (point-min)))
+	(pop-to-buffer b)
+	)
+       (t
+	(with-current-buffer b
+	  (buffer-string)))
+       )
       )
     )
   )
@@ -130,6 +143,19 @@ args is a list with car = 'eval
 ; (split (perl-command-2 "map {print \"$_ \"} @INC"))
 ; (loop for x in (perl-command-2 "map {print \"$_ \"} @INC" :show 'split) collect (canonify x 0))
 
+(defun perl-site-lib ()
+  (expand-file-name (perl-command-2 "use Config;  print $Config{sitelib};"))
+  )
+; (perl-site-lib)
+(defun perl-arch-lib ()
+  (expand-file-name (perl-command-2 "use Config;  print $Config{archlib};"))
+)
+; (perl-arch-lib)
+(defun perl-libs ()
+  (expand-file-name (perl-command-2 "use Config;  print $Config{sitelib}, ' ', $Config{archlib};"))
+  )
+; (perl-libs)
+
 (defun perl-command (s &rest args)
   " run perl script S on ARGS returning stdout as a string.
 stderr is available on the file `*stderr*' 
@@ -137,35 +163,35 @@ so for example use (read-stderr) to inspect it.
 " 
   (interactive "sperl script: ")
 
-  (save-excursion
-    (let* ((b (get-buffer-create-1 *perl-stdout*))
-	   (e (stderr))
-	   (fs (find-script s)))
+  (let* ((b (get-buffer-create-1 *perl-stdout*))
+	 (e (stderr))
+	 (fs (find-script s)))
 
-      (unless fs (error "%s script not found" s))
+    (unless fs (error "%s script not found" s))
 
-      (cond ((not fs)
-	     (message "warning: script %s not found" s)
-	     nil)
-	    ((apply 'call-process
-		    (nconc
-		     (list *perl-command* nil (list b e) nil fs)
-		     (remove* nil args)))
-	     (prog1 
-		 (cond ((interactive-p) 
-			(switch-to-buffer b) 
-			(beginning-of-buffer))
-		       (t 
-			(set-buffer b)
-			(chomp (buffer-string)))
-		       )
-	       (let ((ret (read-stderr)))
-		 (and ret (message ret)))
-	       )
+    (cond ((not fs)
+	   (message "warning: script %s not found" s)
+	   nil)
+	  ((apply 'call-process
+		  (nconc
+		   (list *perl-command* nil (list b e) nil fs)
+		   (remove* nil args)))
+	   (prog1 
+	       (cond ((interactive-p) 
+		      (switch-to-buffer b) 
+		      (goto-char (point-min)))
+		     (t 
+		      (with-current-buffer b
+			(chomp (buffer-string))))
+		     )
+	     (let ((ret (read-stderr)))
+	       (and ret (message ret)))
 	     )
-	    (t (message (read-stderr))))
-      ))
+	   )
+	  (t (message (read-stderr))))
+    )
   )
+; (perl-command "/z/pl/phoneword")
 
 (defun perl-command-region (start end s &optional delete buffer display &rest args)
   " run perl script S on REGION with ARGS.
@@ -195,7 +221,7 @@ see `call-process-region'"
     (if (setq *last-perl-script* (string* script))
 	(progn
 	  (perl-command-region p m script nil b nil)
-	  (message (save-excursion (set-buffer b) (buffer-string)))
+	  (message (with-current-buffer b (buffer-string)))
 	  (kill-buffer b)
 	  )
       )

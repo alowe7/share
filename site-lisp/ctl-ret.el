@@ -4,8 +4,7 @@
 (unless (fboundp 'ctl-RET-prefix) 
     (define-prefix-command 'ctl-RET-prefix))
 
-(unless (and (boundp 'ctl-RET-map) ctl-RET-map)
-  (setq ctl-RET-map (symbol-function 'ctl-RET-prefix)))
+(defvar ctl-RET-map (symbol-function 'ctl-RET-prefix))
 
 ; apparently C-RET is not a good prefix key if you're on telnet session
 (if window-system

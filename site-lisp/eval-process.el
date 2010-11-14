@@ -1,9 +1,11 @@
 (put 'eval-process 'rcsid 
  "$Id$")
+
 ;; a package to return process evaulation as a string
 
 (require 'zap)
 (require 'trim)
+(require 'cat-utils)
 
 ;; processes that return values
 
@@ -38,8 +40,7 @@ this function evaluates to the process output  "
        (dir (default-directory*))
        (buffer (get-buffer-create " *eval*"))
        v)
-    (save-excursion
-      (set-buffer buffer)
+    (with-current-buffer buffer
       (erase-buffer)
       (setq default-directory dir)
       (setq last-exit-status nil)
@@ -78,6 +79,21 @@ see `eval-process'
  "
   (interactive "scommand: ")
   (insert (funcall 'eval-process cmd args))
+  )
+
+(defun read-file (f &optional chomp)
+  "returns contents of FILE as a string
+with optional second arg CHOMP, applies `chomp' to the result
+" 
+  (and f (file-exists-p f)
+       (save-window-excursion
+	 (let ((b (zap-buffer " *tmp*")) s)
+	   (insert-file-contents f)
+	   (setq s (buffer-string))
+	   (kill-buffer b)
+	   (if chomp s (chomp s)))
+	 )
+       )
   )
 
 ;; todo -- rewrite to use &rest

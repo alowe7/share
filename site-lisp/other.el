@@ -1,22 +1,22 @@
 (put 'other 'rcsid
  "$Id$")
 
+(require 'typesafe)
+(require 'dired)
+(require 'input)
+(require 'roll)
+
+(defvar *force-copy-other* nil "cfo confirms before clobbering unless set")
+
 (defun other-lastline (&optional p) 
   (cond ((< p (point-max))
 	 (goto-char p))
 	(t
-	 (end-of-buffer)
-	 (previous-line 1))
+	 (goto-char (point-max))
+	 (forward-line -1))
     )
   )
 
-(defun other-get-filename ()
-  (funcall 
-   (cond ((eq major-mode 'dired-mode) 'dired-get-filename)
-	  ((eq major-mode 'fb-mode) 'fb-indicated-file)
-	  (t 'indicated-filename))
-   )
-  )
 
 (defun other-next-line (arg)
   (interactive "p")
@@ -56,14 +56,11 @@
 
 (defun get-filename ()
   "if in dired mode, returns `dired-get-marked-files' 
-if in fb-mode, returns `fb-get-filename'
 else returns `buffer-file-name'
 "
   (cond
    ((eq major-mode 'dired-mode) 
     (condition-case err (dired-get-marked-files) (error nil)))
-   ((eq major-mode 'fb-mode)
-    (string* (fb-get-filename)))
    (t 
     (or (string* (thing-at-point 'filename)) (buffer-file-name)))
    )
@@ -71,15 +68,18 @@ else returns `buffer-file-name'
 
 (defun cfo1 (f obd)
   (let
-      ((target (and f (concat obd (file-name-nondirectory f)) )) force1)
+      ((target (and f (concat obd (file-name-nondirectory f)) )) 
+       (force *force-copy-other*)
+       force1
+       bail)
 
-    (if (or (and (boundp 'force) force)
+    (if (or force
 	    (not (file-exists-p target))
 
 	    (let ((ret (y-or-n-q-p (format "file %s exists.  overwrite?" target) "!")))
 	      
 	      (cond
-	       ((eq ret ?!) (setq force t))
+	       ((eq ret ?!) (setq force t))  ; remember force setting for the rest of this execution
 	       ((eq ret ?q) (setq bail t))
 	       (ret (setq force1 t)))
 
@@ -121,7 +121,10 @@ else returns `buffer-file-name'
 
 (defun rfo1 (f obd)
   (let
-      ((target (and f (concat obd (file-name-nondirectory f)) )) force1)
+      ((target (and f (concat obd (file-name-nondirectory f)) )) 
+       (force *force-copy-other*)
+       force1
+       bail)
 
     (if (or (and (boundp 'force) force)
 	    (not (file-exists-p target))

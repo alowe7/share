@@ -6,7 +6,7 @@
 
 (global-set-key "" 'ctl-\\-prefix)
 
-(setq ctl-\\-map (symbol-function  'ctl-\\-prefix))
+(defvar ctl-\\-map (symbol-function  'ctl-\\-prefix))
 
 
 (provide 'ctl-backslash)

@@ -1,6 +1,8 @@
 (put 'fixframe 'rcsid
  "$Id$")
 
+(require 'assoc-helpers)
+
 (defun fixed-font ()
   (if (and (eq window-system 'x) (fboundp 'x-list-fonts))
       (loop for page in '("iso8859" "iso10646") thereis

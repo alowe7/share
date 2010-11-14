@@ -1,6 +1,9 @@
 (put 'pod 'rcsid
  "$Id$")
 
+(require 'perl-command)
+(require 'cat-utils)
+
 ; functions to facilitate using pod from emacs
 
 (defvar pod2text (find-script "pod2text"))
@@ -9,7 +12,7 @@
   "find pod for FILE in optional BUFFER"
   (interactive "ffile: ")
   (let* ((b (cond ((buffer-live-p buffer) buffer)
-		  (t (zap-buffer (or buffer "*pod*"))))))
+		  (t (get-buffer-create-1 (or buffer "*pod*"))))))
     (set-buffer b)
     (insert 
      (perl-command pod2text f))
@@ -26,7 +29,7 @@
     (help-mode)
     (set-buffer-modified-p nil)
     (setq buffer-read-only t)
-    (beginning-of-buffer)
+    (goto-char (point-min))
     b)
   )
 
@@ -34,25 +37,27 @@
 (defun perldoc2 (module)
   "find perldoc for MODULE where module is of the form XX::YY"
   (interactive "sModule: ")
-  (if (string-match "::" module) (setq module (replace-in-string "::" "/" module)))
-  (let* ((fn (loop for x in (mapcar 'expand-file-name (split (chomp (reg-query "machine" "software/perl" "sitelib")) ";"))
-		  when (file-exists-p (concat x "/" module ".pm"))
-		  return (concat x "/" module ".pm")))
-	(b (if fn (zap-buffer (concat (file-name-sans-extension fn) " *pod*")))))
+  (if (string-match "::" module) (setq module (replace-regexp-in-string "::" "/" module)))
+
+  (let* ((fn (loop for x in (mapcar 'expand-file-name (split (perl-libs)))
+		   when (file-exists-p (concat x "/" module ".pm"))
+		   return (concat x "/" module ".pm")))
+	 (b (if fn (get-buffer-create-1 (concat (file-name-sans-extension fn) " *pod*")))))
     (if b (progn
 	    (pod2text fn b)
 	    (set-buffer b)
 	    (cd (file-name-directory fn))))
-    ))
+    )
+  )
 
-
+;(perldoc2 "File::Basename")
 ;(perldoc2 "XML::Parser")
 
 ;; these allow pod2text to catch non-found man pages, and if they're perl scripts, try to pod them.
 (defun man-cooked-fn () 
   (if (= 0 (length (buffer-string)))
       (let* (
-	     (bufname (buffer-name Man-buffer))
+	     (bufname (and (boundp 'Man-buffer) (buffer-name Man-buffer)))
 	     (orig-man (and bufname (car (split (cadr (split (car (split bufname "*"))))))))
 	     (f (and orig-man (find-script orig-man))))
 

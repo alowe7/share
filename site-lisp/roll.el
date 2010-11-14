@@ -1,9 +1,11 @@
 (put 'roll 'rcsid 
  "$Id$")
-(provide 'roll)
+
+(require 'typesafe)
 (require 'buffers)
-(require 'cl)
 (require 'completion)
+(require 'input)
+(require 'cl)
 
 (defmacro roll (l)
   "destructively roll LIST as a ring"
@@ -99,7 +101,7 @@ calling SELECTFN to choose one
 	      (while (> len 0)
 		(if (< i 0) (setq i (1- len)))
 		(let* ((bb (aref a i))
-		       (name (cond (displayfn (funcall displayfn bb)) ((stringp bb) bb) ((symbolp bb) (symbol-name bb)) (string* (condition-case err (format "%s" bb) (error nil)) "*unprintable*")))
+		       (name (cond (displayfn (funcall displayfn bb)) ((stringp bb) bb) ((symbolp bb) (symbol-name bb)) (t "*unprintable*")))
 		       (v (y-or-n-q-p ; name can have formatting characters in it
 			   (replace-regexp-in-string "%" "%%" name) 
 			   (concat "dp/\C-m ?"
@@ -121,7 +123,7 @@ calling SELECTFN to choose one
 		   ((roll-nav v 'help)
 		    (progn
 		      (message "roll-buffer: RET: goto; BS,p: back; SPACE,n: forward; DEL,d: delete; ?: help; q: quit")
-		      (read-key-p)
+		      (read-char)
 		      (setq i (1- i))
 		      ))
 
@@ -247,82 +249,11 @@ applies `switch-to-buffer' as displayfn
     )
   )
 
-(defun real-buffer-list (&optional arg)
-  "returns `buffer-list' excluding killed buffers & those with names beginning with a space
-with optional ARG, returns in reverse order
-"
-  (let* ((rbl (buffer-list))
-	 (bl (append (cdr rbl) (list (car rbl))))
-	 bn val x)
-    (dolist (x (if arg bl (reverse bl)))
-      (setq bn (buffer-name x))
-  ;skip killed buffers & those whose name begins with a space
-      (and bn (> (length bn) 0) (not (eq ?\  (aref bn 0))) (push x val)))
-    val))
-
-(defun* buffer-list-2 (&key mode named in modified notmodified withpat)
-  ; (assert (or (not (or modified notmodified)) (not (and modified notmodified))))
-
-  (loop for x being the buffers
-	when
-	(and (or (not mode)
-		 (eq (progn (set-buffer x) major-mode) mode))
-	     (or (not named)
-		 (string-match named (buffer-name x)))
-	     (or (not in)
-		 (let ((d (if (buffer-file-name x) (buffer-file-name x) (save-excursion (set-buffer x) default-directory))))
-		   (and d (string-match in d))))
-	     (or (not modified)
-		 (buffer-modified-p x))
-	     (or (not notmodified)
-		 (not (buffer-modified-p x)))
-	     (or (not withpat)
-		 (string-match withpat (save-excursion (set-buffer x) (buffer-string)))))
-	collect x)
-  )
-
 (defun roll-buffer-list (&optional l) 
   "roll visible buffers.  if optional LIST is specified, use that as the list of buffers to roll"
   (interactive)
   (roll-list (or l (real-buffer-list nil)) 'buffer-name 'kill-buffer-1 'switch-to-buffer)
   )
-
-(defun roll-buffer-list-1 (mode) 
-  "like roll-buffer-list, but only list buffers in mode"
-  (interactive (list 
-  ; complete with any symbol that ends in "-mode"
-		(complete* "list buffers in mode (%s): " "-mode$" (or roll-mode major-mode))
-		))
-  (roll-list
-   (collect-buffers
-    (cond
-     ((and (stringp mode) (> (length mode) 0)) 
-      (intern mode))
-     ((or (stringp mode) (not mode) roll-mode) roll-mode)
-     (t (setq roll-mode major-mode)))
-    )
-   'buffer-name 'kill-buffer 'switch-to-buffer)
-  )
-
-(defun roll-buffer-list-2 (l) 
-  "like `roll-buffer-list`, but require LIST
-LIST may be an a-list, in which case, interpret the cars as buffers, and print the cadrs as lables"
- 
-  (loop for x in l
-	with b = nil
-	with m = nil
-	do
-	(setq b (if (listp x) (car x) x))
-	(setq m (if (listp x) (cadr x) ""))
-	(set-buffer b)
-	(message "%s -- %s" (buffer-name) m)
-	(let ((c (read-char)))
-	  (cond 
-	   ((eq c ?\C-m) (return (pop-to-buffer b)))
-	   ((eq c ?o) (return (switch-to-buffer-other-window b)))
-	   ((eq c ?/) (return (pop-to-buffer b)))
-	   )
-	  )))
 
 (defun roll-buffer-no-files (&optional mugger) (interactive "smodified? ") 
   (roll-list (collect-buffers-no-files (string* mugger))
@@ -366,7 +297,7 @@ LIST may be an a-list, in which case, interpret the cars as buffers, and print t
 (defun first-shell () (interactive) (let ((b (first-mode 'shell-mode))) (if b (switch-to-buffer b) (message "not found"))))
 
 
-(defun roll-buffer-list-2 (mode named in modified notmodified withpat)
+(defun roll-buffer-list-3 (mode named in modified notmodified withpat)
   (interactive
    (let* ((mode (intern (completing-read "mode: " (mapcar '(lambda (x) (list (symbol-name x) x)) (symbols-like "-mode$")))))
 	  (named (string* (read-string "named: ")))
@@ -398,9 +329,11 @@ LIST may be an a-list, in which case, interpret the cars as buffers, and print t
     )
   )
 
-(fset 'qurol 'roll-buffer-list-2)
+(fset 'qurol 'roll-buffer-list-3)
 
 ; (qurol 'shell-mode nil "/l" nil nil "insight")
 ; (qurol "emacs-lisp-mode" nil nil nil nil "doit")
 ; (qurol "" nil nil nil nil "doit")
 ; (roll-list (buffer-list-2 :mode 'shell-mode :in "/l") 'buffer-name)
+
+(provide 'roll)

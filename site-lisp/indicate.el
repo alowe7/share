@@ -1,6 +1,7 @@
 (put 'indicate 'rcsid 
  "$Id$")
 
+(require 'typesafe)
 (require 'thingatpt) ; which see
 
 ;;
@@ -143,12 +144,14 @@ indicated-word is the default. remaining args are applied to prompt"
   (let ((v arg))
     (catch 'done
       (while t
-	(progn
-	  (setq x  (- (read-char) ?0))
+	(let
+	    ((x  (- (read-char) ?0)))
 	  (if (or (> x 9) (< x 0)) (throw 'done v))
 	  (push x v)
 	  (message "%d" (getcvt v)) ;echo prompt
-	  )) )
+	  )
+	)
+      )
     (getcvt v)
     )
   )

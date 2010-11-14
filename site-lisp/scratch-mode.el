@@ -3,6 +3,7 @@
 
 (require 'ctl-ret)
 (require 'buff)
+(require 'mktime)
 
 (define-derived-mode scratch-mode fundamental-mode "scratch" "")
 
@@ -10,7 +11,7 @@
   "kills all empty scratch buffers"
   (interactive)
   (loop for b in (collect-buffers-mode 'scratch-mode) 
-	when (= 0 (save-excursion (set-buffer b) (buffer-size))) 
+	when (= 0 (with-current-buffer  b (buffer-size))) 
 	do (kill-buffer b)
 	)
   )
@@ -117,58 +118,22 @@ the default mode used is `major-mode'
 	(x (/ (window-width) 2)))
     (roll-list l 
 	       '(lambda (b)
-		  (format "%s\t\t%s..." (buffer-name b) (save-excursion (set-buffer b) (tr (buffer-substring (point-min) (min (1- (point-max)) x)) '((?
+		  (format "%s\t\t%s..." (buffer-name b) (with-current-buffer  b (tr (buffer-substring (point-min) (min (1- (point-max)) x)) '((?
 																		      "\\n"))))))
 	       'kill-buffer-1 
 	       'switch-to-buffer)
     )
   )
  
-; todo: factor with bury-buffer (see buffers.el)
-(defun unbury-scratch-buffers () 
-  (interactive)
-  (unless (member last-command '(unbury-scratch-buffers  unbury-scratch-buffers-1))
-    (setq *buffer-list-vector* (apply 'vector (collect-scratch-buffers))
-	  *buffer-list-vector-length* (length *buffer-list-vector*)
-	  *buffer-list-vector-index* 0))
-  
-  (if (> (length *buffer-list-vector*) 0)
-      (switch-to-buffer
-       (aref *buffer-list-vector* 
-	     (setq *buffer-list-vector-index* 
-		   (%% (1+ *buffer-list-vector-index*)
-		      (length *buffer-list-vector*)))))
-    (message "no more scratch buffers")
-    )
-  )
-
 (defmacro %% (x y)
   "X modulo Y symmetrical around 0"
   (let* ((z (eval x)) (w (eval y)) (u (% z w))) (if (< u 0) (+ z w) u))
-  )
-
-(defun unbury-scratch-buffers-1 () 
-  (interactive)
-  (unless (member last-command '(unbury-scratch-buffers  unbury-scratch-buffers-1))
-    (setq *buffer-list-vector* (apply 'vector (collect-scratch-buffers))
-	  *buffer-list-vector-length* (length *buffer-list-vector*)
-	  *buffer-list-vector-index* 0))
-
-  (switch-to-buffer 
-   (aref *buffer-list-vector*  
-	 (setq *buffer-list-vector-index* 
-	       (%% (1- *buffer-list-vector-index*)
-		   (length *buffer-list-vector*)))))
-
   )
 
 (defun list-scratch-buffers ()
   (interactive)
   (list-buffers-mode 'scratch-mode)
   )
-
-(global-set-key (vector 'C-M-next) 'unbury-scratch-buffers)
-(global-set-key (vector 'C-M-prior) 'unbury-scratch-buffers-1)
 
 (modify-syntax-entry ?< "(" scratch-mode-syntax-table)
 (modify-syntax-entry ?> ")" scratch-mode-syntax-table)

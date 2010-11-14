@@ -1,6 +1,7 @@
 (put 'filetime 'rcsid 
  "$Id$")
 
+(require 'eval-process)
 
 (defun filemodtime (f)
   (and f (elt (file-attributes f) 5)))

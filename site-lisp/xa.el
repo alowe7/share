@@ -22,7 +22,7 @@ return the bufferstring
 		(switch-to-buffer b)
 		(xa-mode)
 		(if prompt (setq mode-line-buffer-identification prompt))
-		(if initial-input (progn (insert initial-input) (beginning-of-buffer)))
+		(if initial-input (progn (insert initial-input) (goto-char (point-min))))
   ; todo make this a custom sub mode
 		(local-set-key "\C-c\C-c" 'xa-done)
 		(local-set-key "\C-c\C-u" '(lambda () (interactive) (y-or-n-p "are you sure? ") (throw 'done  t)))
@@ -43,7 +43,8 @@ return the bufferstring
 
 (defun xa-done ()
   (interactive)
-  (kill-new (setq s (buffer-string))) ; save as a kill in case caller loses
-  (throw 'done nil))
+  (kill-new (buffer-string)) ; save as a kill in case caller loses
+  (throw 'done nil)
+  )
 
 (provide 'xa)

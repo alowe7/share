@@ -1,15 +1,10 @@
 (put 'qsave 'rcsid
      "$Id$")
 
-;; by Andy Lowe (c) 1993, 1994, 1995, 1996, 1997, 1998
+;; (c) alowe 1993-2010
 
 ;;  You are permitted to copy, modify and redistribute this software and associated documentation.
 ;;  You may not change this copyright notice, and it must be included in any copy made.
-;;  
-;;  THIS PROGRAM IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-;;  EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-;;  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-;;  
 
 (require 'cl)
 
@@ -33,8 +28,7 @@
   )
 
 (defun qsaved-output-index (b &optional v)
-  (save-excursion
-    (set-buffer b)
+  (with-current-buffer b
     (let* ((a (intern (buffer-name))))
       (if v
 	  (put a 'qsaved-index v))
@@ -49,45 +43,46 @@ updates window to reflect new top of list.
 returns newly current cell data, if any
 "
   (interactive "ndepth of saved list: ")
-  (save-excursion
-    (and b (set-buffer b))
+  (with-current-buffer (or b (current-buffer))
     (let* ((a (intern (buffer-name)))
 	   (n (or n 0))
 	   (v (get a 'qsave))
 	   (len (length v)))
-      (cond ((= n 0) 
-	     (progn 
-	       (put a 'qsave nil)
-	       (setq buffer-read-only nil)
-	       (erase-buffer)
-	       (setq buffer-read-only t)
-	       (put a 'qsaved-index 0)
-	       (setq mode-line-buffer-identification nil)
-	       (setq mode-line-process (format " %d/%d" (length v) (length v)))
-	       ))
-	    ((> len n)
-	     (let ((m (- len n))
-		   ss)
-	       (while v (push (pop v) ss))
-	       (while (> m 0) (progn
-				(pop ss)
-				(setq m (1- m))))
-	       (while ss (push (pop ss) v))
-	       (let* ((j (length v))
-		      (x (nth (1- j) v)))
-		 (erase-buffer)
-		 (insert (qsave-cell-contents x))
-		 (setq mode-line-buffer-identification (pp (qsave-cell-label x) t))
-		 (set-window-start (display-buffer (current-buffer)) 1)
-		 (setq mode-line-process (format " %d/%d" j j))
-		 (put a 'qsaved-index j)
-		 (put a 'qsave v)
-		 (qsave-cell-data x)
+      (prog1
+	  (cond ((= n 0) 
+		 (progn 
+		   (put a 'qsave nil)
+		   (setq buffer-read-only nil)
+		   (erase-buffer)
+		   (setq buffer-read-only t)
+		   (put a 'qsaved-index 0)
+		   (setq mode-line-buffer-identification nil)
+		   (setq mode-line-process (format " %d/%d" (length v) (length v)))
+		   ))
+		((> len n)
+		 (let ((m (- len n))
+		       ss)
+		   (while v (push (pop v) ss))
+		   (while (> m 0) (progn
+				    (pop ss)
+				    (setq m (1- m))))
+		   (while ss (push (pop ss) v))
+		   (let* ((j (length v))
+			  (x (nth (1- j) v)))
+		     (erase-buffer)
+		     (insert (qsave-cell-contents x))
+		     (setq mode-line-buffer-identification (pp (qsave-cell-label x) t))
+		     (set-window-start (display-buffer (current-buffer)) 1)
+		     (setq mode-line-process (format " %d/%d" j j))
+		     (put a 'qsaved-index j)
+		     (put a 'qsave v)
+		     (qsave-cell-data x)
+		     )
+		   )
 		 )
-	       )
-	     )
-	    )
-      (force-mode-line-update)
+		)
+	(force-mode-line-update)
+	)
       )
     )
   )
@@ -100,8 +95,7 @@ returns newly current cell data, if any
 (defun qsave-search (b l &optional d)
   "push contents of BUFFER and associated LABEL along with optional DATA
 into internal stack"
-  (save-excursion
-    (set-buffer b)
+  (with-current-buffer b
 
     (let* ((p (point))
 	   (a (intern (buffer-name)))

@@ -2,7 +2,9 @@
  "$id: cat-utils.el,v 1.4 2004/03/11 19:01:01 cvs exp $")
 
 (require 'backquote)
+(require 'typesafe)
 (require 'cl)
+(require 'thingatpt)
 
 ;; perl like apis 
 
@@ -33,7 +35,7 @@ removes empty strings unless optional third parameter KEEP-EMPTY-STRINGS is set
   (and s
        (let* ((start 0)
 	      (pat (cond 
-		    ((char-valid-p pat) (format "%c" pat))
+		    ((characterp pat) (format "%c" pat))
 		    ((string* pat) pat) 
 		    (t "[ \C-i\C-j]")))
 	      (ret
@@ -135,16 +137,20 @@ adds to tail of PLACE THING
 	(t s))
   )
 
-(defun basename (f &optional ext)
+(defun basename (f)
   "perl flavored composition of `file-name-sans-extension' and `file-name-nondirectory'
 "
-  (file-name-sans-extension (file-name-nondirectory f) ext)
+  (file-name-sans-extension (file-name-nondirectory f))
   )
 
 (defun cmp (s1 s2 &optional ignore-case) 
   "perl flavored version of `compare-strings'
 "
   (compare-strings s1 nil nil s2 nil nil ignore-case) 
+  )
+
+(defun bgets () 
+  (chomp (thing-at-point (quote line)))
   )
 
 (provide 'cat-utils)

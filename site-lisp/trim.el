@@ -1,11 +1,13 @@
 (put 'trim 'rcsid
  "$Id$")
 
+(require 'long-comment)
 
 (defun trim-trailing-white-space (&optional s) (interactive)
   " trim trailing white space from STRING"
   (if (interactive-p)
-      (replace-regexp "[ 	]*$" "")
+      (while (search-forward "[ 	]*$" nil t)
+	(replace-match "" nil t))
     (and s 
 	 (let* ((p (string-match "[ 	]$" s)))
 	   (substring s 0 p)))))
@@ -15,14 +17,11 @@
   (interactive)
   (if (interactive-p)
       (save-excursion
-	(replace-regexp "^[ 	]*" "")
+	(while (search-forward "^[ 	]*" nil t)
+	  (replace-match "" nil t))
 	)
-    (and s 
-	 (replace-regexp-in-string "^[ 	]+" "" 
-			    (replace-regexp-in-string "
-[ 	]+" "
-" s)
-			    )))
+    (and s (replace-regexp-in-string "^[\t\n ]+" "" s))
+    )
   )
 
 (defun trim-white-space (&optional s) 
@@ -43,32 +42,50 @@
 (fset 'trim 'trim-white-space)
 
 (defun trim-buffer ()
-  (replace-regexp "[ ]*$" "" nil)
+  (while (search-forward "[ ]*$" nil t)
+    (replace-match "" nil t))
   )
 
-(defun trim-region (begin end)
-	(interactive "r")
-	(save-excursion
-		(narrow-to-region begin end)
-		(replace-regexp "[ ]*$" "" nil)
-		(widen)
-		)
-	)
-
-(defun trim-blank-lines (&optional s)
-  "trim blank lines from region.
-"
-  (interactive "P")
-  (if (and (interactive-p) (null s))
-      (let ((s (buffer-substring (point) (mark))))
-	(delete-region (point) (mark))
-	(insert
-	 (replace-regexp-in-string "^[	 ]*
-" "" s)))
-
-    (replace-regexp-in-string "^[	 ]*
-" "" s)
+(defun trim-region (beg end)
+  (interactive "r")
+  (save-excursion
+    (goto-char beg)
+    (while (re-search-forward "[ \t]*$" end t)
+      (replace-match "" nil nil))
     )
   )
+
+(defun trim-blank-lines-region (beg end)
+  "trim blank lines from region.
+"
+  (interactive "r")
+  (save-excursion
+    (goto-char beg)
+    (while (re-search-forward  "[\n]+" end t)
+      (replace-match "\n" nil nil))
+    )
+  )
+
+(defun trim-blank-lines (&optional s)
+  "if interactive, `trim-blank-lines-region'
+else from a program, trim blank lines and return optional STRING
+"
+  (interactive "P")
+  (cond 
+   ((string* s)
+    (replace-regexp-in-string "[\n]+" "\n" s))
+   (t s)
+   )
+  )
+
+(/*
+ (assert (string= (trim-blank-lines "asdf
+sadf
+
+sadf	asdf") "asdf
+sadf
+sadf	asdf")
+	 )
+ )
 
 (provide 'trim)
