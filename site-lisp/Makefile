@@ -8,7 +8,7 @@ SHARE = /usr/share/emacs
 SITELISP = $(SHARE)/site-lisp/x-$(VERSION)
 EMACS=$(EMACSPATH)/emacs
 PWD=$(shell pwd)
-MAKE_AUTOLOADS=../../emacs/make-autoloads
+MAKE_AUTOLOADS=/usr/local/bin/make-autoloads
 
 .PHONY: FORCE
 
@@ -35,6 +35,4 @@ clean: $(FORCE)
 	rm -f .autoloads .autoloads.ship *.elc
 
 compile: $(SHIPS)
-	EMACSLOADPATH="$(EMACSLOADPATH);$(PWD)" $(EMACS) --batch --eval="(setq byte-compile-warnings '(not cl-functions))" -e batch-byte-compile $^
-
-
+	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $^
