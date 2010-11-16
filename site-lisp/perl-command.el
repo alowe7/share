@@ -184,11 +184,11 @@ so for example use (read-stderr) to inspect it.
 		      (with-current-buffer b
 			(chomp (buffer-string))))
 		     )
-	     (let ((ret (read-stderr)))
+	     (let ((ret (read-stderr e)))
 	       (and ret (message ret)))
 	     )
 	   )
-	  (t (message (read-stderr))))
+	  (t (message (read-stderr e))))
     )
   )
 ; (perl-command "/z/pl/phoneword")
@@ -230,9 +230,11 @@ see `call-process-region'"
 
 (global-set-key "\C-c!" 'perl-command-region-1)
 
-(defun read-stderr ()
-  (and (file-exists-p *stderr*)
-       (read-file *stderr* t))
+(defun read-stderr (&optional e)
+  (let ((stderr (or e *stderr*)))
+    (and (file-exists-p stderr)
+	 (read-file stderr t))
+    )
   )
 
 ; tbd promote
