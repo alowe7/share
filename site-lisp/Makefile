@@ -5,10 +5,15 @@ VERSION = 1.0
 SHELL=/bin/sh
 INSTALL = install
 SHARE = /usr/share/emacs
-SITELISP = $(SHARE)/site-lisp/x-$(VERSION)
+PKG=x
+SITELISP = $(SHARE)/site-lisp/$(PKG)-$(VERSION)
+SITESTART = $(SHARE)/site-lisp/site-start.d
+AUTOLOADS=$(PKG)-autoloads
 EMACS=$(EMACSPATH)/emacs
 PWD=$(shell pwd)
-MAKE_AUTOLOADS=/usr/local/bin/make-autoloads
+MAKE_AUTOLOADS  := $(shell which make-autoloads  2> /dev/null)
+
+XZFLAGS = -t1
 
 .PHONY: FORCE
 
@@ -16,7 +21,7 @@ SOURCES=*.el
 SHIPS=$(SOURCES)
 TARGETS := $(SOURCES:.el=.elc)
 
-all: .autoloads
+all:
 
 sources:
 	@echo $(SOURCES)
@@ -25,14 +30,15 @@ ship: compile
 	rm -rf $(SITELISP)
 	mkdir -p $(SITELISP)
 	install -m 444 $(TARGETS) $(SITELISP)
-	$(MAKE_AUTOLOADS) --top $(SITELISP) -c $(SOURCES) > .autoloads.ship
-	install -m 444 .autoloads.ship $(SITELISP)/.autoloads
+	$(MAKE_AUTOLOADS) --top $(SITELISP) -c $(SOURCES) > $(AUTOLOADS)
+	mkdir -p $(SITESTART)
+	install -m 444 $(AUTOLOADS) $(SITESTART)
 
 .xz.dat: $(SOURCES)
-	xz -ywqn $(SOURCES)
+	xz $(XZFLAGS) $^
 
 clean: $(FORCE)
-	rm -f .autoloads .autoloads.ship *.elc
+	rm -f $(AUTOLOADS)
 
 compile: $(SHIPS)
 	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $^
