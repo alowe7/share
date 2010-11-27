@@ -7,7 +7,7 @@
   "switch to a temp buffer to edit an entry.
 giving optional PROMPT
 starting out with INITIAL-INPUT
-using BUFFER
+using BUFFER (a buffer or buffer name)
 if CANCEL-MESSAGE is set, puts up a message when cancelled
 return the bufferstring
 
@@ -15,7 +15,12 @@ return the bufferstring
 "
 
   (condition-case v
-      (let ((b (or buffer (get-buffer-create "*edit new entry*"))) 
+      (let ((b
+	     (cond 
+	      ((not buffer) (get-buffer-create "*edit new entry*"))
+	      ((stringp buffer) (get-buffer-create buffer))
+	      (t buffer))
+	     ) 
 	    s)
 	(save-excursion
 	  (if (catch 'done
@@ -34,6 +39,7 @@ return the bufferstring
 				   (message "cancelled")
 				   (sit-for 0 500)
 				   (message "")))
+	    (setq s (buffer-string))
 	    ))
 	(unless buffer (kill-buffer b)) ; kill b only if we created it
 	s)

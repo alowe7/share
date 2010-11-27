@@ -17,6 +17,7 @@ XZFLAGS = -t1
 
 .PHONY: FORCE
 
+# everything in this directory is shippable
 SOURCES=*.el
 SHIPS=$(SOURCES)
 TARGETS := $(SOURCES:.el=.elc)
@@ -38,7 +39,7 @@ ship: compile
 	xz $(XZFLAGS) $^
 
 clean: $(FORCE)
-	rm -f $(AUTOLOADS)
+	rm -f $(AUTOLOADS) *.elc
 
 compile: $(SHIPS)
 	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $^
