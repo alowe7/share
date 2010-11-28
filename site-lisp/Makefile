@@ -12,7 +12,7 @@ AUTOLOADS=$(PKG)-autoloads
 # EMACS=$(EMACSPATH)/emacs
 EMACS=/usr/local/lib/emacs-23.2/bin/emacs
 PWD=$(shell pwd)
-MAKE_AUTOLOADS  := $(shell which make-autoloads  2> /dev/null)
+MAKE_AUTOLOADS=../bin/make-autoloads
 
 XZFLAGS = -t1
 
@@ -28,13 +28,15 @@ all:
 sources:
 	@echo $(SOURCES)
 
-ship: compile
+ship: compile autoloads
 	rm -rf $(SITELISP)
 	mkdir -p $(SITELISP)
 	install -m 444 $(TARGETS) $(SITELISP)
-	$(MAKE_AUTOLOADS) --top $(SITELISP) -c $(SOURCES) > $(AUTOLOADS)
 	mkdir -p $(SITESTART)
 	install -m 444 $(AUTOLOADS) $(SITESTART)
+
+autoloads: FORCE
+	$(MAKE_AUTOLOADS) --top $(SITELISP) -c $(SOURCES) --sourcepath $(PWD) > $(AUTOLOADS)
 
 .xz.dat: $(SOURCES)
 	xz $(XZFLAGS) $^
