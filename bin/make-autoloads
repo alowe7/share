@@ -1,0 +1,142 @@
+#!/usr/local/bin/perl
+#      $Id: make-autoloads 903 2010-11-14 19:12:52Z alowe $
+
+=pod
+
+=head1 NAME
+
+make-autoloads
+
+=head1 SYNOPSIS
+
+ make-autoloads [options] | <filelist>
+	
+	produce an expression on STDOUT which can be evaluated to autoload
+	all functions and macros defined in those modules.
+	<filelist> is a list of emacs lisp modules, and should be given in load-path order.
+ 	if a given file appears more than once along load-path, the first occurrence will win.
+	
+=head1 DESCRIPTION
+
+	options:
+                --help                  print usage
+                --top                   top of directory tree
+                --prefix <prefix>   optional prefix for alist (default=basename($top))
+                --version              print version
+                --force                 override previously autoloaded functions.
+                --compiled                 use compiled version
+                --sourcepath                 set sourcepath
+
+=head1 BUGS
+
+	this whole thing is a REALLY BAD IDEA
+
+	no comprehension of compiled lisp at all.  but who needs it?
+
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+use Cwd;
+use File::Spec;
+use File::Spec::Unix qw(catfile);
+
+binmode STDOUT;
+
+GetOptions(
+	   'help|h' => \$opt_help,
+	   'top|d=s' => \$opt_top,
+	   'prefix=s' => \$opt_prefix,
+	   'version|v' => \$opt_version,
+	   'force|f' => \$opt_force,
+	   'compiled|c' => \$opt_compiled,
+	   'sourcepath|s=s' => \$opt_sourcepath
+	   );
+
+if ($opt_version) {
+    $revision='$Revision: 1.37 $ $Date: 2009-11-28 19:25:48 $';
+    (undef,$version)=split(/ /,$revision);
+    print "make-autoloads $version\n";
+    exit;
+}
+
+!($opt_help || ((scalar @ARGV) > 0)) && pod2usage( { -verbose => 2, -output => \*STDERR });
+
+$top=$opt_top || getcwd;
+
+if ($opt_prefix) {
+    $prefix=$opt_prefix . "-";
+}
+else {
+    split('/',$top);
+    $prefix=$_[-1] . "-";
+}
+
+if ($opt_sourcepath) {
+    print "(add-to-list 'find-function-source-path \"$opt_sourcepath\")\n";
+}
+
+$alist_symbol=$prefix . "autoload-alist";
+
+# todo: lisp lexer?
+# todo: grab doc strings too
+%autoloads=();
+
+$defpat="(defun\*|defun|defmacro|defvar|define-derived-mode|fset|defalias)";
+
+print "(setq $alist_symbol '( \n";
+
+foreach $fn (@ARGV) {
+    if ($fn =~ /\.autoloads$/) {
+	print "(load-file \"$fn\")\n";
+    }
+    else {
+#	@path=split(?/?, $fn);
+#	$f=pop(@path);
+
+	if ($fn=~/^\//) {
+	    $f=$fn;
+	}
+	else {
+	    $f=File::Spec::Unix->catfile($top,$fn);
+	    $f=~s/\.el$/.elc/ if ($opt_compiled);
+	}
+
+	if (open(F, $fn)) {
+	    binmode F;
+	    print ";  $fn\n";
+	    foreach (<F>) {
+		# this intentionally requires defuns to start in column 1 to miss false positives
+		if (/^\($defpat/o) {
+		    ($pat, $func)=split;
+		    # in case open paren is stuck to identifier
+		    $func =~ s/[()]//g;
+		    # fset and defalias require quoted args
+		    if ($1 =~ /fset|defalias/o) {
+			$func=~s/^\'//;
+		    }
+
+		    if (defined $autoloads{$func}) {
+			# extended or overridden definition
+			print "; ($func \"$f\")\n";
+		    }
+		    else {
+			print "($func \"$f\")\n";
+			$autoloads{$func}=$f 
+			}
+		}
+	    }
+	    close(F);
+	}
+    }
+}
+
+print "))\n";
+
+# clause to cause (car x) to be loaded from (cadr x)
+$aload_clause="(autoload (car x) (cadr x) nil t)";
+# guard clause to avoid overwriting something thats already declared autoload from elsewhere unless forcing
+$aload_clause="(let ((fn (condition-case x (symbol-function  (car x)) (error nil)))) (and (null fn) $aload_clause))" unless $opt_force;
+
+print "(mapcar '(lambda (x) $aload_clause) $alist_symbol)\n";
