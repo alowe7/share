@@ -8,5 +8,8 @@ SHELL=/bin/sh
 all:
 
 ship:
+	$(MAKE) --directory bin ship
 	$(MAKE) --directory site-lisp ship
+
+
 
