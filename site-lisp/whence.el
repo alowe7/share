@@ -1,6 +1,8 @@
 (put 'whence 'rcsid 
  "$Id: whencepath.el 8 2010-10-05 01:38:57Z svn $")
 
+(require 'directories)
+
 ; just to remove dependency on ... whencepath
 (defun whence (thing &optional path)
   "return location of THING along optional PATH

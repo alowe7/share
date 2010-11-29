@@ -1,6 +1,18 @@
 (put 'sh 'rcsid
  "$Id$")
 
+
+;; sh -- bain-damaged interpreter for shell scripts
+
+; note: this might get redefined should you ever load doctor.el
+(defun $ (filename) 
+  "Substitute environment variables referred to in FILENAME.
+"
+
+  (expand-file-name (substitute-in-file-name filename))
+  )
+; ($ "$HOME:$USERNAME")
+
 (defun ! (x) (not x))
 
 (defun -a (x) 

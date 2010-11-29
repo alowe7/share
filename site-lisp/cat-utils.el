@@ -12,17 +12,21 @@
   "concatenate elements of sequence sepearted by optional sep.
 with third optional arg, apply printfn to elements of seq to obtain strings.
 seq may be a list or vector
+sep may be a char or a string
 "
 
   (let ((l 
 	 (cond ((listp seq) seq)
 	       ((vectorp seq) (loop for x across seq collect x))
-	       (t nil))))
+	       (t nil)))
+	(sep (cond ((characterp sep) (char-to-string sep)) (t sep)))
+	)
     (mapconcat 'identity l sep)
     )
   )
 ; (join '("foo" "bar") " ")
 ; (join (list "a" "b" "c") ":")
+; (join (list "a" "b" "c") ?:)
 ; (join (vector "a" "b" "c") "-")
 
 

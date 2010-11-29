@@ -42,7 +42,7 @@ autoloads: FORCE
 	xz $(XZFLAGS) $^
 
 clean: $(FORCE)
-	rm -f $(AUTOLOADS) *.elc
+	rm -f $(AUTOLOADS) *.elc .xz.dat
 
 compile: $(SHIPS)
 	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $^
