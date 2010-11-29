@@ -1,5 +1,5 @@
 (put 'whence 'rcsid 
- "$Id: whencepath.el 8 2010-10-05 01:38:57Z svn $")
+ "$Id$")
 
 ; just to remove dependency on ... whencepath
 (defvar whence-executable-terminator (if (eq window-system 'w32) "\\(.exe\\)$" "$") "regexp to match executable files")
@@ -15,5 +15,6 @@ if specified, PATH is a list of directories.  default is split $PATH
    for x in l when (setq y (directory-files x t pat)) return (car y)
    )
   )
+
 ; (whence "pwd")
 (provide 'whence)
