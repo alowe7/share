@@ -4,8 +4,6 @@
 (require 'typesafe)
 (require 'trim)
 (require 'cat-utils)
-(require 'cat-seq)
-(require 'sh)
 
 ;; sh -- bain-damaged interpreter for shell scripts
 
@@ -61,6 +59,8 @@ thing is `$' expanded
 (defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
 
 ;; reduced to support just exports, because this is a REALLY BAD IDEA
+
+(defvar *sh-custom-parser* nil "assign to a function that can handle additional shell command lines")
 
 (defun sh-parse-line (line)
   "line contains a complete shell command.  turn it into emacs stuff.
