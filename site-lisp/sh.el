@@ -1,6 +1,11 @@
 (put 'sh 'rcsid
  "$Id$")
 
+(require 'typesafe)
+(require 'trim)
+(require 'cat-utils)
+(require 'cat-seq)
+(require 'sh)
 
 ;; sh -- bain-damaged interpreter for shell scripts
 
@@ -9,9 +14,14 @@
   "Substitute environment variables referred to in FILENAME.
 "
 
-  (expand-file-name (substitute-in-file-name filename))
+  (and  
+   (string* filename)
+   (substitute-in-file-name filename)
+   )
   )
-; ($ "$HOME:$USERNAME")
+; (assert (not ($ nil)))
+; (assert (progn (setenv "foo" "bar")  (string= ($ "$foo") "bar")))
+; (assert (progn (setenv "foo" "baz") (setenv "bar" "bo")  (string= ($ "$foo:$bar") "baz:bo")))
 
 (defun ! (x) (not x))
 
@@ -47,5 +57,45 @@ thing is `$' expanded
 (defun -d (x)  "THING is a dir" (and (string* x) (file-directory-p ($ x)) x))
 (defun -z (x) "THING is null or string of zero length" (or (null x) (= 0 (length ($ x)))))
 (defun -n (x) "THING is neither null nor a string of zero length" (not (-z x)))
+
+(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
+
+;; reduced to support just exports, because this is a REALLY BAD IDEA
+
+(defun sh-parse-line (line)
+  "line contains a complete shell command.  turn it into emacs stuff.
+"
+
+  (cond
+   ((string-match *assignment-regexp* line)
+    (let ((name (match-string 2 line)) (value (match-string 3 line)))
+      (setenv name ($ value))))
+   ((and *sh-custom-parser* (listp *sh-custom-parser*))
+    (loop for parser in *sh-custom-parser* thereis 
+	  (apply *sh-custom-parser* (list line))))
+
+   ((functionp *sh-custom-parser*) 
+    (apply *sh-custom-parser* (list line)))
+   )
+  )
+; (assert (progn (sh-parse-line "foo=baz") (string= ($ "$foo") "baz")))
+; (assert (progn (sh-parse-line "export foo = bar") (string= ($ "$foo") "bar")))
+; (assert (progn (sh-parse-line "foo=") (string= ($ "$foo") "bar")))
+
+(defun scan-file (fn)
+  "interpret shell script FILE to some extent."
+  (interactive "ffilename: ")
+  (not (not (mapcar 'sh-parse-line (split (read-file fn) "\C-j"))))
+  )
+; (scan-file (expand-file-name "~/.private/.xdbrc"))
+
+(defun scan-file-p (fn)
+  "scan FILE as a shell script.
+return nil if file does not exist or cannot be read.  else returns the filename
+"
+  (if (-r fn) (scan-file fn))
+  )
+
+; (scan-file-p (expand-file-name "~/.private/.zdbrc"))
 
 (provide 'sh)
