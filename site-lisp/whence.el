@@ -2,7 +2,7 @@
  "$Id$")
 
 ; just to remove dependency on ... whencepath
-(defvar whence-executable-terminator (if (eq window-system 'w32) "\\(.exe\\)$" "$") "regexp to match executable files")
+(defvar whence-executable-terminator (if (eq window-system 'w32) "\\(.exe\\)?$" "$") "regexp to match executable files")
 
 (defun whence (thing &optional path)
   "return location of THING along optional PATH
