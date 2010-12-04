@@ -69,8 +69,8 @@ if ($opt_prefix) {
     $prefix=$opt_prefix . "-";
 }
 else {
-    split('/',$top);
-    $prefix=$_[-1] . "-";
+    my($pathelements)=split('/',$top);
+    $prefix=$pathelements[-1] . "-";
 }
 
 if ($opt_sourcepath) {
