@@ -58,6 +58,8 @@ thing is `$' expanded
 
 (defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
 
+(defvar *comment-regexp* "^[[:blank:]]*#" "regexp matching a shell comment")
+
 ;; reduced to support just exports, because this is a REALLY BAD IDEA
 
 (defvar *sh-custom-parser* nil "assign to a function that can handle additional shell command lines")
@@ -67,6 +69,7 @@ thing is `$' expanded
 "
 
   (cond
+   ((string-match  *comment-regexp* line) nil)
    ((string-match *assignment-regexp* line)
     (let ((name (match-string 2 line)) (value (match-string 3 line)))
       (setenv name ($ value))))
@@ -78,6 +81,8 @@ thing is `$' expanded
     (apply *sh-custom-parser* (list line)))
    )
   )
+; (assert (not (sh-parse-line "# blah")))
+; (assert (progn (sh-parse-line "foo=baz") (sh-parse-line "# foo=bar") (string= ($ "$foo") "baz")))
 ; (assert (progn (sh-parse-line "foo=baz") (string= ($ "$foo") "baz")))
 ; (assert (progn (sh-parse-line "export foo = bar") (string= ($ "$foo") "bar")))
 ; (assert (progn (sh-parse-line "foo=") (string= ($ "$foo") "bar")))
