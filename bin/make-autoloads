@@ -11,28 +11,41 @@ make-autoloads
 
  make-autoloads [options] | <filelist>
 	
-	produce an expression on STDOUT which can be evaluated to autoload
-	all functions and macros defined in those modules.
+=head1 DESCRIPTION
+
+	produce an expression on STDOUT which can be evaluated to autoload all functions and macros defined in those modules.
 	<filelist> is a list of emacs lisp modules, and should be given in load-path order.
  	if a given file appears more than once along load-path, the first occurrence will win.
 	
-=head1 DESCRIPTION
+=head1 OPTIONS
 
-	options:
                 --help                  print usage
-                --top                   top of directory tree
+                --top <dir>                   top of directory tree where files are loaded from
                 --prefix <prefix>   optional prefix for alist (default=basename($top))
                 --version              print version
                 --force                 override previously autoloaded functions.
-                --compiled                 use compiled version
-                --sourcepath                 set sourcepath
+                --compiled                 autoload function from compiled module
+                --sourcepath <path>                 add source path to `find-function-source-path'
+                --patterns <pat>                 additional patterns to autoload
+
+=head1 EXAMPLES
+
+	make-autoloads --top /usr/share/emacs/site-lisp/x-1.0 -c *.el --sourcepath /src/share/site-lisp > x-autoloads
+
+	examine elisp source files from current directory, but arrange to autoload from compiled modules in specified top directory.
+	add specified source path to `find-function-source-path'
 
 =head1 BUGS
 
-	this whole thing is a REALLY BAD IDEA
+	this whole thing is a somewhat bad idea.  but not really worse than using magic comments to carry semantics
 
-	no comprehension of compiled lisp at all.  but who needs it?
+	when using --compiled and --sourcepath, docstrings may not be available until after load.
+	also `find-function' may not work as expected.  though `describe-function' may serve as a workaround.
 
+=head1 ALSO SEE
+
+	the conventional emacs mechanism is to use a magic autoload comment (often called an "autoload cookie")
+	followed by an invocation of `update-file-autoloads' to build a loaddefs.el
 
 =cut
 
@@ -83,7 +96,7 @@ $alist_symbol=$prefix . "autoload-alist";
 # todo: grab doc strings too
 %autoloads=();
 
-$defpat="(defun\*|defun|defmacro|defvar|define-derived-mode|fset|defalias)";
+$defpat="(defun\*|defun|defmacro|define-derived-mode|fset|defalias)";
 
 print "(setq $alist_symbol '( \n";
 

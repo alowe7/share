@@ -9,16 +9,16 @@
 ;; perl like apis 
 
 (defun join (seq &optional sep printfn)
-  "concatenate elements of sequence sepearted by optional sep.
-with third optional arg, apply printfn to elements of seq to obtain strings.
-seq may be a list or vector
-sep may be a char or a string
+  "concatenate elements of SEQUENCE sepearted by optional SEP.
+sequence may be a list or vector.
+sep may be a char or a string.  default is no separator
+with optional third arg, apply PRINTFN to elements of sequence.
+printfn should accept a single argument and return string values .
 "
 
-  (let ((l 
-	 (cond ((listp seq) seq)
-	       ((vectorp seq) (loop for x across seq collect x))
-	       (t nil)))
+  (let ((l (cond ((listp seq) seq)
+		 ((vectorp seq) (loop for x across seq collect x))
+		 (t nil)))
 	(sep (cond ((characterp sep) (char-to-string sep)) (t sep)))
 	)
     (mapconcat 'identity l sep)

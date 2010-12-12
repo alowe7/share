@@ -86,6 +86,7 @@ prompt and default are evaluated exactly once.
 prompt may have formatting strings in it, see `format'
 prompt and default are evaluated exactly once.
 also see `read-file-name'
+if default-insert-directory is set 
 "
   `(let* ((*prompt* ,prompt)
 	  (*default* ,default)

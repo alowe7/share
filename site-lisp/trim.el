@@ -13,11 +13,12 @@
 	   (substring s 0 p)))))
 
 (defun trim-leading-white-space (&optional s) 
-  " trim leading white space from STRING"
+  " trim leading white space.
+when called from a program, and optional STRING is specified, trim white space from that."
   (interactive)
   (if (interactive-p)
       (save-excursion
-	(while (search-forward "^[ 	]*" nil t)
+	(while (re-search-forward "^[ 	]+" nil t)
 	  (replace-match "" nil t))
 	)
     (and s (replace-regexp-in-string "^[\t\n ]+" "" s))
@@ -25,17 +26,17 @@
   )
 
 (defun trim-white-space (&optional s) 
-	"trim white-space in string.  when called interactively, trims region."
-	(interactive)
+  "trim white-space in string.  when called interactively, trims region."
+  (interactive)
   (if (interactive-p)
-			(save-restriction
-			 (narrow-to-region (point) (mark))
-			 (goto-char (point-min))
-			 (call-interactively 'trim-leading-white-space)
-			 (goto-char (point-min))
-			 (call-interactively 'trim-trailing-white-space))
+      (save-restriction
+	(narrow-to-region (point) (mark))
+	(goto-char (point-min))
+	(call-interactively 'trim-leading-white-space)
+	(goto-char (point-min))
+	(call-interactively 'trim-trailing-white-space))
     (if (> (length s) 0)
-				(trim-trailing-white-space (trim-leading-white-space s))
+	(trim-trailing-white-space (trim-leading-white-space s))
       s)
     )
   )

@@ -9,23 +9,27 @@
        )
   )
 
-(defun add-association (mapping list &optional clobber)
+(defmacro add-association (mapping list &optional clobber)
   "add an assoc MAPPING to a-list LIST.
-clobber an existing mapping if optional CLOBBER is nonnil
+replace an existing mapping only if optional CLOBBER is set
 "
-  (let ((l (eval list)))
-    (cond ((not (assoc (car mapping) l))
-	   (push mapping l))
-	  (clobber
-	   (setq l (remove* mapping l :test '(lambda (x y)     
-					       (equal (car x) (car y)))))
-	   (push mapping l))
-	  )
-    (set list l)
-    )
+  `(let ((m ,mapping)
+	 (l (eval ,list)))
+
+     (cond ((not (assoc (car m) l))
+	    (push m l))
+	   (,clobber
+	    (setq l (remove* m l :test '(lambda (x y) (equal (car x) (car y)))))
+	    (push m l))
+	   )
+
+     (set ,list l)
+     )
   )
-; (setq x '((a 1) (b 2) (c 3)))
-; (add-association '(d 4) 'x t)
+; 
+; (assert (let ((test-alist '((a . 1) (b . 2) (c . 3)))) (add-association '(c . 4) 'test-alist )  (= 3 (cdr (assoc 'c test-alist)))))
+; (assert (let ((test-alist '((a . 1) (b . 2) (c . 3)))) (add-association '(c . 4) 'test-alist t) (= 4 (cdr (assoc 'c test-alist)))))
+; (assert (let ((test-alist '((a . 1) (b . 2) (c . 3)))) (add-association '(d . 4) 'test-alist t) (and (= 3 (cdr (assoc 'c test-alist))) (= 4 (cdr (assoc 'd test-alist))))))
 
 (defun remove-association (key list)
   "remove any assoc mapping key in a-list LIST.
