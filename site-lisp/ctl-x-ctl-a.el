@@ -1,4 +1,5 @@
-(put 'ctl-x-ctl-a 'rcsid "$Id$")
+(put 'ctl-x-ctl-a 'rcsid
+ "$Id$")
 
 (unless (fboundp 'ctl-x-ctl-a-prefix) 
     (define-prefix-command 'ctl-x-ctl-a-prefix))
