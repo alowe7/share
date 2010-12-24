@@ -241,22 +241,22 @@ with optional PATTERN, return matching symbols
   )
 
 ; (member-1 "a" '("a") 0)
-; (let ((*string-lists-with* 1)) (call-interactively 'vars-with))
+; (let ((*apropos-string-lists-with* 1)) (call-interactively 'vars-with))
 
-(defvar *string-lists-with* t "include lists of strings in `vars-with'")
+(defvar *apropos-string-lists-with* 1 "include lists of strings in `vars-with'")
 
 (defun vars-with (s)
   "list variables where value is a string matching regexp PAT
-if the variable `*string-lists-with*' is set, then include lists of strings containing PAT
-if `*string-lists-with*' is a number, don't descend into lists any deeper than that
+if the variable `*apropos-string-lists-with*' is set, then include lists of strings containing PAT
+if `*apropos-string-lists-with*' is a number, don't descend into lists any deeper than that
 "
   (interactive "sString: ")
   (let ((v (loop for sym being the symbols
 		 when (boundp sym)
 		 when (or (and (stringp (eval sym)) (string-match s (eval sym)))
-			  (and *string-lists-with* (listp (eval sym)) 
+			  (and *apropos-string-lists-with* (listp (eval sym)) 
 			       (member-1 s (eval sym) 
-					 (and (numberp  *string-lists-with*)  *string-lists-with*))))
+					 (and (numberp  *apropos-string-lists-with*)  *apropos-string-lists-with*))))
   ; specifically exclude target
 		 unless (string-match "^s" (symbol-name sym) )
 		 collect sym)))
