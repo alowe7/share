@@ -9,8 +9,9 @@ PKG=x
 SITELISP = $(SHARE)/site-lisp/$(PKG)-$(VERSION)
 SITESTART = $(SHARE)/site-lisp/site-start.d
 AUTOLOADS=$(PKG)-autoloads
+EMACS=$(shell which emacs)
 # EMACS=$(EMACSPATH)/emacs
-EMACS=/usr/local/lib/emacs-23.2/bin/emacs
+# EMACS=/usr/local/lib/emacs-23.2/bin/emacs
 PWD=$(shell pwd)
 MAKE_AUTOLOADS=../bin/make-autoloads
 
