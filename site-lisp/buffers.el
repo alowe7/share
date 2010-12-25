@@ -1,7 +1,6 @@
 (put 'buffers 'rcsid 
  "$Id: buffers.el 890 2010-10-04 03:34:24Z svn $")
 
-(require 'scratch-mode)
 (require 'zap)
 (require 'cl)
 

@@ -2,7 +2,6 @@
  "$Id$")
 
 (require 'typesafe)
-(require 'buffers)
 (require 'completion)
 (require 'input)
 (require 'cl)

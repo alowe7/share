@@ -3,8 +3,6 @@
 
 (require 'long-comment)
 
-
-
 (/*
 use Pod::Usage;
 =pod
@@ -196,12 +194,10 @@ use Pod::Usage;
 =cut
 */)
 
-(add-to-load-path (file-name-directory (if load-in-progress load-file-name (buffer-file-name))))
 
 (require 'cl)
 (require 'xml)
 (require 'dom)
-(require 'xpath)
 (require 'xpath-helpers)
 (require 'zap)
 
@@ -398,7 +394,7 @@ if only one property exists on the specified item, use that as default property.
 
   (let* ((item (expand-file-name (dired-what-file)))
 	 (property (or property (and (interactive-p)
-				     (completing-read "edit property: " (union (svn-pl item) ) *svn-default-properties*)))))
+				     (completing-read "edit property: " (union (svn-pl item) *svn-default-properties*))))))
     (assert property)
     (svn-pe property item)
     )

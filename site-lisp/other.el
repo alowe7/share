@@ -2,9 +2,7 @@
  "$Id$")
 
 (require 'typesafe)
-(require 'dired)
 (require 'input)
-(require 'roll)
 
 (defvar *force-copy-other* nil "cfo confirms before clobbering unless set")
 
