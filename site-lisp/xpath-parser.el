@@ -46,9 +46,6 @@
 
 ;;; Code:
 
-(require 'semantic/wisent)
-(eval-when-compile (require 'semantic/wisent/comp))
-
 ;; (setq wisent-verbose-flag t)
 (defconst xpath-document-root-symbol
   (make-symbol "document-root")

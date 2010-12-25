@@ -61,7 +61,6 @@
 
 (require 'cl)
 (require 'dom)
-(require 'xpath-parser)
 
 ;; Axes
 
