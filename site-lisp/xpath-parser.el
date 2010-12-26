@@ -45,7 +45,6 @@
 ;; See xpath.el for more information on all the functions used.
 
 ;;; Code:
-(require 'semantic/wisent/comp)
 
 ;; (setq wisent-verbose-flag t)
 (defconst xpath-document-root-symbol
