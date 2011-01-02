@@ -79,7 +79,7 @@ optional DISPATCH is an a-list:
 	((char fn) ...)
 
 each association dispatches a keyboard character to a function.  if
-the key is pressed, the function of one arg is applied to the list: (v i)
+the key is pressed, the function of two args is applied to the list: (v i)
 where v is the vector of l and i is the relative position of the subject element in v
 
 the dispatch function may (throw 'done nil) to exit the input loop.
@@ -103,7 +103,7 @@ calling SELECTFN to choose one
 		       (name (cond (displayfn (funcall displayfn bb)) ((stringp bb) bb) ((symbolp bb) (symbol-name bb)) (t "*unprintable*")))
 		       (v (y-or-n-q-p ; name can have formatting characters in it
 			   (replace-regexp-in-string "%" "%%" name) 
-			   (concat "dp/\C-m ?"
+			   (vconcat "dp/\C-m ?"
 				   (apply 'vector (loop for x in dispatch collect (car x))))
 			   )))
 
@@ -122,7 +122,7 @@ calling SELECTFN to choose one
 		   ((roll-nav v 'help)
 		    (progn
 		      (message "roll-buffer: RET: goto; BS,p: back; SPACE,n: forward; DEL,d: delete; ?: help; q: quit")
-		      (read-char)
+		      (read-char-p)
 		      (setq i (1- i))
 		      ))
 
