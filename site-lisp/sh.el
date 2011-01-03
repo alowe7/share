@@ -87,6 +87,14 @@ thing is `$' expanded
 ; (assert (progn (sh-parse-line "export foo = bar") (string= ($ "$foo") "bar")))
 ; (assert (progn (sh-parse-line "foo=") (string= ($ "$foo") "bar")))
 
+(defun sh-parse-indicated-line ()
+  (interactive)
+  (let* ((line (thing-at-point 'line)))
+    (sh-parse-line line)
+    )
+  )
+
+
 (defun scan-file (fn)
   "interpret shell script FILE to some extent."
   (interactive "ffilename: ")

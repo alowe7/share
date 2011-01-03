@@ -31,7 +31,7 @@ all:
 sources:
 	@echo $(SOURCES)
 
-ship: compile autoloads
+ship: autoloads compile autoloads
 	rm -rf $(SITELISP)
 	mkdir -p $(SITELISP)
 	install -m 444 $(TARGETS) $(SITELISP)
@@ -47,5 +47,5 @@ autoloads: FORCE
 clean: $(FORCE)
 	rm -f $(AUTOLOADS) *.elc .xz.dat
 
-compile: $(SHIPS)
-	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $^
+compile: $(FORCE)
+	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $(SHIPS)
