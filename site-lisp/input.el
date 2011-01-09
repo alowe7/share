@@ -66,7 +66,7 @@ with optional string CHARS, also matches specified characters.
 "
   (with-temp-buffer 
     (insert str)
-    (remove-text-properties (point-min) (point-max) '(face))
+    (set-text-properties (point-min) (point-max) nil)
     (buffer-string))
   )
 

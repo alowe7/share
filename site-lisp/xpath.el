@@ -70,7 +70,7 @@ AXIS must be a string used in `xpath-axes'."
   (let ((func (cadr (assoc axis xpath-axes))))
     (if func
 	(funcall func node)
-      (error "Unknown axis: " axis))))
+      (error (format "Unknown axis: %s" axis)))))
 
 (defun xpath-ancestor-axis (node)
   "Return the elements on the ancestor axis.

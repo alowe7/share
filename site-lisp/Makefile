@@ -9,10 +9,7 @@ PKG=x
 SITELISP = $(SHARE)/site-lisp/$(PKG)-$(VERSION)
 SITESTART = $(SHARE)/site-lisp/site-start.d
 AUTOLOADS=$(PKG)-autoloads
-EMACS=$(shell which emacs)
-ifeq ($(strip $(EMACS)),)
-EMACS=$(EMACSPATH)/emacs
-endif
+EMACS:=$(EMACSPATH)/emacs
 
 PWD=$(shell pwd)
 MAKE_AUTOLOADS=../bin/make-autoloads
@@ -47,5 +44,5 @@ autoloads: FORCE
 clean: $(FORCE)
 	rm -f $(AUTOLOADS) *.elc .xz.dat
 
-compile: $(FORCE)
+compile: clean
 	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $(SHIPS)

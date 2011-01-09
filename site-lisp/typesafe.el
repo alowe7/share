@@ -105,13 +105,17 @@ the result of `read-string' is passed to `string*'
   `(let* ((*prompt* ,prompt)
 	  (*table* ,table)
 	  (*d* ,default)
-	  (*rest* ,@rest)
+	  (*rest* ,rest)
 	  (*s* (apply 'completing-read (nconc (list (format *prompt* *d*) *table*) *rest*)))
 	  (v (if (or (null *s*) (= (length *s*) 0)) *d* *s*))
 	  )
      v
      )
   )
-; (completing-read* "foo (%s): " '("a" "b" "c") "c" '(nil t))
+; (completing-read* "foo (%s): " '("a" "b" "c") "c" )  
+; (completing-read* "foo (%s): " '("a" "b" "c") "c" '(nil t))  ; same as above but require match
+; (completing-read* "thing (%s): "  '(("a" "1") ("b" "2")("c" "3")) "b" '(nil t))
+
+
 
 (provide 'typesafe)
