@@ -181,8 +181,9 @@ a typical use might be with (interactive) :
 
 "
 
-  `(let ((*i* ,(indicated-word)))
-     (string* (completing-read (apply 'format ,prompt (cons *i* ,@args)) ,table) *i*)
+  `(let ((*i* ,(indicated-word))
+	 (*rest* ,@args))
+     (string* (completing-read (apply 'format ,prompt (cons *i* *rest*)) ,table) *i*)
      )
   )
 ; (complete-indicated-word "you are here (%s) %s: " '("able" "baker" "charlie" "delta") '("not"))asdf
