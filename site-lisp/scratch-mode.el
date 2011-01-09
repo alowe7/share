@@ -127,8 +127,15 @@ the default mode used is `major-mode'
  
 (defmacro %% (x y)
   "X modulo Y symmetrical around 0"
-  (let* ((z (eval x)) (w (eval y)) (u (% z w))) (if (< u 0) (+ z w) u))
+  `(let* ((z ,x) (w ,y) (u (if (= 0 w) 0 (% z w)))) (if (< u 0) (+ z w) u))
   )
+; (assert (= (%% 0 1) 0))
+; (assert (= (%% 1 0) 0))
+; (assert (= (%% 0 0) 0))
+; (assert (= (%% 4 3) 1))
+; (assert (= (%% 4 -3) 1))
+; (assert (= (%% -4 3) -1))
+; (assert (= (%% -4 -3) -7))
 
 (defun list-scratch-buffers ()
   (interactive)
