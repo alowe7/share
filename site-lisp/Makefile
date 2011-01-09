@@ -28,7 +28,7 @@ all:
 sources:
 	@echo $(SOURCES)
 
-ship: autoloads compile autoloads
+ship: compile autoloads
 	rm -rf $(SITELISP)
 	mkdir -p $(SITELISP)
 	install -m 444 $(TARGETS) $(SITELISP)
@@ -41,7 +41,7 @@ autoloads: FORCE
 .xz.dat: $(SOURCES)
 	xz $(XZFLAGS) $^
 
-clean: $(FORCE)
+clean: FORCE
 	rm -f $(AUTOLOADS) *.elc .xz.dat
 
 compile: clean
