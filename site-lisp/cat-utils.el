@@ -133,12 +133,23 @@ adds to tail of PLACE THING
   )
 
 (defun chomp (s &optional c)
-  "maybe chop trailing linefeed"
+  "maybe chop trailing end-of line (lf or crlf)"
   (cond ((not (string* s)) s)
-	((eq (aref (substring s -1) 0) (or c ?
-					   )	  )
-	 (substring s 0 -1))
-	(t s))
+	(t
+	 (let* ((cr ?\r)
+		(lf ?\n)
+		last)
+	   (cond
+	    ((and (> (length s) 1) (eq (setq last (aref (substring s -2) 0)) cr))
+	     (substring s 0 -2))
+	    ((and  (> (length s) 1) (eq last lf))
+	     (substring s 0 -2))
+	    ((eq (aref (substring s -1) 0) lf)
+	     (substring s 0 -1))
+	    (t s))
+	   )
+	 )
+	)
   )
 
 (defun basename (f)
