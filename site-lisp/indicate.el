@@ -49,8 +49,9 @@ in the current buffer
 
       (setq *indicated-word-region* (bounds-of-thing-at-point 'word)
 	    w (if *indicated-word-region*
-		  (buffer-substring (car *indicated-word-region*) (cdr *indicated-word-region*))
-		""))
+		  (remove-text-properties-from-string (buffer-substring (car *indicated-word-region*) (cdr *indicated-word-region*)))
+		"")
+	    )
 
       (set-syntax-table old-table)
 

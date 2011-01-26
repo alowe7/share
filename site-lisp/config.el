@@ -34,6 +34,11 @@
 ; (setq *debug-pre-load-hook* t *debug-post-load-hook* t)
 ; (setq *debug-pre-load-hook* nil *debug-post-load-hook* nil)
 
+(defvar *debug-pre-load-with-code-conversion-hook* nil)
+(defvar *debug-post-load-with-code-conversion-hook* nil)
+; (setq  *debug-pre-load-with-code-conversion-hook* t  *debug-post-load-with-code-conversion-hook* t)
+; (setq  *debug-pre-load-with-code-conversion-hook* nil  *debug-post-load-with-code-conversion-hook* nil)
+
 (defvar *disable-load-hook* nil)
 
 ; (defvar *debug-config-list* '(xdb))
@@ -45,11 +50,13 @@ specify string to trap an explicit load, specify an atom to trap a require")
 
 ; a couple of helpr functions
 (defun add-to-load-path-p (dir &optional append)
+  "maybe add DIR to `load-path', if it is a directory and not already there.
+add to front of list unless optional APPEND is set.  see `add-to-load-path'
+"
   (let ((dir (expand-file-name dir)))
     (when (file-directory-p dir)
       (add-to-load-path dir append)
       (load-autoloads dir)
-	
       )
     )
   )
@@ -89,18 +96,22 @@ no errors if files don't exist.
 	(ad-activate 'load))
     )
 
-  (unless *disable-load-hook*
-    (and *debug-pre-load-hook* (debug))
-    (loadp "pre-" (ad-get-arg 0))
-    )
+  (let ((arg (ad-get-arg 0)))
 
-  ad-do-it
+    (unless *disable-load-hook*
+      (and *debug-pre-load-hook* (debug))
+      (loadp "pre-" arg)
+      )
 
-;; tbd -- this has a bug if the hooked module has been required inside (eval-when-compile (require ...))
+    ad-do-it
 
-  (unless *disable-load-hook*
-    (and *debug-post-load-hook* (debug))
-    (loadp "post-" (ad-get-arg 0))
+    ;; tbd -- this has a bug if the hooked module has been required inside (eval-when-compile (require ...))
+
+    (unless *disable-load-hook*
+      (and *debug-post-load-hook* (debug))
+      (loadp "post-" arg)
+      )
+
     )
 
   (if (and (ad-has-any-advice 'load)
@@ -113,6 +124,9 @@ no errors if files don't exist.
 	(ad-activate 'load)
 	))
   )
+; (if (ad-is-advised 'load) (ad-unadvise 'load))
+; (setq *debug-post-load-hook* t  *debug-post-load-hook* t)
+
 
 (defadvice load-with-code-conversion (around 
 		 hook-load-with-code-conversion
@@ -133,14 +147,14 @@ no errors if files don't exist.
     )
 
   (unless *disable-load-hook*
-    (and *debug-pre-load-hook* (debug))
+    (and *debug-pre-load-with-code-conversion-hook* (debug))
     (loadp "pre-" (ad-get-arg 0))
     )
 
   ad-do-it
 
   (unless *disable-load-hook*
-    (and *debug-post-load-hook* (debug))
+    (and *debug-post-load-with-code-conversion-hook* (debug))
     (loadp "post-" (ad-get-arg 0))
     )
 
@@ -155,6 +169,7 @@ no errors if files don't exist.
 	))
   )
 
+; (if (ad-is-advised 'load-with-code-conversion) (ad-unadvise 'load-with-code-conversion))
 ; (ad-has-enabled-advice 'load 'around)
 ; (ad-unadvise 'load)
 ; (ad-is-advised 'load)

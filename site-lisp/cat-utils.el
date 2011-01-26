@@ -29,7 +29,15 @@ printfn should accept a single argument and return string values .
 ; (join (list "a" "b" "c") ?:)
 ; (join (vector "a" "b" "c") "-")
 
-
+; if s begins with a quote then only match a terminating quote
+(defmacro xmatch (pat string start) `(let* ((p ,pat) (s ,string) (r ,start)) (and (< r (length s)) (let* ((c (aref s r)) (p2 (cond ((eq ?\" c) (concat "\"" p)) ((eq ?\' c) (concat "\'" p)) (t p))) (v (string-match p2 s r)))  (cond ((null v) v) (t (+ v (- (length p2) (length p)))))))))
+; (assert (string= "\"bar\"" (let* ((teststring "foo,\"bar\",baz") (start 4) (v (xmatch "," teststring start))) (if v (substring teststring start v) (substring teststring start)))))
+; (assert (string= "\"bar,baz\"" (let* ((teststring "foo,\"bar,baz\"") (start 4) (v (xmatch "," teststring start))) (if v (substring teststring start v) (substring teststring start)))))
+; (assert (string= "\"bar,baz\"" (let* ((teststring "foo,\"bar,baz\",bo") (start 4) (v (xmatch "," teststring start))) (if v (substring teststring start v) (substring teststring start)))))
+; (assert (string= "\"foo,bar\"" (let* ((teststring "\"foo,bar\",baz") (start 0) (v (xmatch "," teststring start))) (if v (substring teststring start v) (substring teststring start)))))
+; (assert (string= "foo" (let* ((teststring "foo,bar,baz") (start 0) (v (xmatch "," teststring start))) (if v (substring teststring start v) (substring teststring start)))))
+; (assert (= 4 (xmatch  "[ \C-i\C-j]"  "abcd efgh, ijkl	mnop  "  0)))
+; (assert (null (xmatch  "[ \C-i\C-j]"  "abcd efgh, ijkl	mnop  "  22)))
 
 (defun split (s &optional pat keep-empty-strings)
   "split STRING into a list at regexp or character PAT
@@ -45,8 +53,13 @@ removes empty strings unless optional third parameter KEEP-EMPTY-STRINGS is set
 	      (ret
 	       (nconc 
 		(loop
-		 while (string-match pat s start)
-		 collect (prog1 (substring s start (match-beginning 0)) (setq start (match-end 0)))
+		 with end = start
+  ; return from xmatch not always = (match-beginning 0)
+		 while (setq end (xmatch pat s start))
+		 collect (prog1 
+			     (substring s start end) 
+			   (setq start (match-end 0))
+			   )
 		 )
 		(list (substring s start))
 		)))
@@ -59,9 +72,11 @@ removes empty strings unless optional third parameter KEEP-EMPTY-STRINGS is set
 	 )
        )
   )
-; (split "abcd efgh, ijkl	mnop  " )
-; (split "foo;bar;baz" ?;)
-; (split "-outline-Arial-bold-r-normal-normal-13-97-96-96-p-60-iso10646-1" "-" t)
+; (assert (equal (split "abcd efgh, ijkl	mnop  " ) '("abcd" "efgh," "ijkl" "mnop")))
+;  (assert (equal (split "foo;bar;baz" ?;) '("foo" "bar" "baz")))
+;  (assert (equal  (split "-outline-Arial-bold-r-normal-normal-13-97-96-96-p-60-iso10646-1" "-" t) '("" "outline" "Arial" "bold" "r" "normal" "normal" "13" "97" "96" "96" "p" "60" "iso10646" "1")))
+;  (assert (equal (split "foo,\"Tuesday, Jan 25 17:25:26 CST 2011\",bar" ",") '("foo" "\"Tuesday, Jan 25 17:25:26 CST 2011\"" "bar")))
+;  (assert (equal (split "foo,bar,\"Tuesday, Jan 25 17:25:26 CST 2011\"" ",") '("foo" "bar" "\"Tuesday, Jan 25 17:25:26 CST 2011\"")))
 
 (defun split2 (s &optional pat)
   "more scalable version of `split'

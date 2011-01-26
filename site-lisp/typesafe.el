@@ -104,9 +104,10 @@ the result of `read-string' is passed to `string*'
 "
   `(let* ((*prompt* ,prompt)
 	  (*table* ,table)
+	  (*tableval* (cond ((symbolp *table*) (eval *table*)) ((functionp *table*) (funcall *table*)) (t *table*)))
 	  (*d* ,default)
 	  (*rest* ,rest)
-	  (*s* (apply 'completing-read (nconc (list (format *prompt* *d*) *table*) *rest*)))
+	  (*s* (apply 'completing-read (nconc (list (format *prompt* *d*) *tableval*) *rest*)))
 	  (v (if (or (null *s*) (= (length *s*) 0)) *d* *s*))
 	  )
      v
@@ -115,7 +116,7 @@ the result of `read-string' is passed to `string*'
 ; (completing-read* "foo (%s): " '("a" "b" "c") "c" )  
 ; (completing-read* "foo (%s): " '("a" "b" "c") "c" '(nil t))  ; same as above but require match
 ; (completing-read* "thing (%s): "  '(("a" "1") ("b" "2")("c" "3")) "b" '(nil t))
-
-
+; (let ((table '(("a" "1") ("b" "2")("c" "3")))) (completing-read* "thing (%s): "  table "b" '(nil t)))
+; (completing-read* "foo (%s): " (lambda () '("a" "b" "c")) "c" '(nil t))
 
 (provide 'typesafe)

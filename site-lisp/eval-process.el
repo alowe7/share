@@ -179,6 +179,7 @@ see `format-time-string' and `time-stamp'"
   (interactive)
   (insert (format-time-string (string* format "%Y/%m/%d %T")))
   )
+; (timestamp)
 
 (defun cksum (f)
   "returns the checksum of FILE

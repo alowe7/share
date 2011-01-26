@@ -1,3 +1,6 @@
+(put 'ctl-meta 'rcsid
+ "$Id$")
+
 (require 'nums)
 
 (defun char-ctrl (char)
