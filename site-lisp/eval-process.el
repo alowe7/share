@@ -10,7 +10,8 @@
 ;; processes that return values
 
 (defun default-directory* ()
-  ; handle case where default-directory is unavailable for some reason
+  "evaluates to `default-directory' but gracefully handle case where it is unavailable for some reason
+"
   (if (file-directory-p default-directory) default-directory (expand-file-name "/"))
   )
 
