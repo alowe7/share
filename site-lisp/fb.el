@@ -1,7 +1,7 @@
 (put 'fb 'rcsid 
  "$Id: fb.el 903 2010-11-14 19:12:52Z alowe $")
 
-(require 'locate)
+; (require 'locate)
 (require 'cat-utils)
 (require 'qsave)
 (require 'trim)

@@ -10,7 +10,13 @@ SITELISP = $(SHARE)/site-lisp
 PKGLISP = $(SITELISP)/$(PKG)-$(VERSION)
 SITESTART = $(SITELISP)/site-start.d
 AUTOLOADS=$(PKG)-autoloads
-EMACS:=$(EMACSPATH)/emacs
+
+ifneq ($(strip $(EMACSPATH)),)
+EMACS := $(EMACSPATH)/emacs
+else
+EMACS := $(shell which emacs  2> /dev/null)
+endif
+
 
 PWD=$(shell pwd)
 MAKE_AUTOLOADS=../bin/make-autoloads
@@ -51,7 +57,11 @@ clean: FORCE
 	rm -f $(AUTOLOADS) *.elc .xz.dat
 
 compile: clean
+ifeq ($(strip $(EMACS)),)
+	@echo "EMACS not found"
+else
 	$(EMACS) --batch --load=byte-compile-directory.el -e batch-byte-compile $(CONFIG) $(SOURCES)
+endif
 
 test: compile
 	$(MAKE) --directory ../test test
