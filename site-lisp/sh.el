@@ -72,7 +72,8 @@ thing is `$' expanded
    ((string-match  *comment-regexp* line) nil)
    ((string-match *assignment-regexp* line)
     (let ((name (match-string 2 line)) (value (match-string 3 line)))
-      (setenv name ($ value))))
+      (setenv name ($ value))
+      (format "%s=%s" name value)))
    ((and *sh-custom-parser* (listp *sh-custom-parser*))
     (loop for parser in *sh-custom-parser* thereis 
 	  (apply *sh-custom-parser* (list line))))
@@ -96,9 +97,11 @@ thing is `$' expanded
 
 
 (defun scan-file (fn)
-  "interpret shell script FILE to some extent."
+  "interpret shell script FILE to some extent.
+return list of command evaluation values with nil removed
+"
   (interactive "ffilename: ")
-  (not (not (mapcar 'sh-parse-line (split (read-file fn) "\C-j"))))
+  (remove* nil (mapcar 'sh-parse-line (split (read-file fn) "\C-j")))
   )
 ; (scan-file (expand-file-name "~/.private/.xdbrc"))
 
