@@ -56,7 +56,7 @@ autoloads: FORCE
 clean: FORCE
 	rm -f $(AUTOLOADS) *.elc .xz.dat
 
-compile: clean
+compile:
 ifeq ($(strip $(EMACS)),)
 	@echo "EMACS not found"
 else

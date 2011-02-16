@@ -64,16 +64,11 @@ add to front of list unless optional APPEND is set.  see `add-to-load-path'
 (defun loadp (prefix file)
   (let* ((f0 (file-name-sans-extension (file-name-nondirectory (format "%s" file))))
 	 (f1 (format "%s%s" prefix f0))
-	 (f2 (loop for x in load-path when (file-exists-p (format "%s/%s.el" x f1)) collect (format "%s/%s.el" x f1))))
+	 (f2 (loop for x in load-path when (file-exists-p (format "%s/%s.el" x f1)) collect (format "%s/%s.el" x f1)))
+	 (do-message (not *config-log-hook*))
+	 )
     
-    (cond ((null f2)
-	   (and *config-log-hook*
-		(message (format  "no matches for %s found in %s" f1 (pp load-path)))))
-	  (t
-	   (loop for f in f2 do
-		 (load f t t)
-		 (and *config-log-hook*
-		      (message (format  "(loadp %s)" f))))))
+    (loop for f in f2 do (load f t do-message))
     )
   )
 
@@ -353,7 +348,7 @@ or override them by post-chaining.
 	     )
 
 	   (if (and arg parent)
-	       (load parent)
+	       (load parent t (not *config-log-hook*))
 	     parent)
 	   )
 	 )
@@ -411,7 +406,7 @@ members may be symbols or strings, see `post-load'
 (require 'find-func)
 (and share
      (let ((site-start.d (concat share "/site-lisp/site-start.d")))
-       (mapc 'load (and (file-directory-p site-start.d) (get-directory-files site-start.d)))
+       (mapc '(lambda (f) (load f t t)) (and (file-directory-p site-start.d) (get-directory-files site-start.d)))
        )
      )
 
