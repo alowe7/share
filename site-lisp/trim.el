@@ -155,11 +155,21 @@ when called from a program, requires two args: BEG and END
   (trim-trailing-white-space-region beg end)
   )
 
-(defun trim-white-space () 
-  "trim white space from `point' to `point-max'
+(defun trim-white-space (&optional from to) 
+  "interactively trim white space from `point' to `point-max'
+when called from a program takes optional args FROM and TO
+if FROM is a string, then call `trim-white-space-string' and returns the result.
+otherwise, FROM should be a character position.
 "
   (interactive)
-  (trim-white-space-region (point) (point-max))
+
+  (cond
+   ((stringp from) (trim-white-space-string from))
+   (t
+    (trim-white-space-region 
+     (if (integer-or-marker-p from) from (point))
+     (if (integer-or-marker-p to) to (point-max))))
+   )
   )
 
 (defun trim-blank-lines-string (s)
