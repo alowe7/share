@@ -2,7 +2,10 @@
  "$Id$")
 
 (require 'long-comment)
-(require 'semantic/wisent/comp)
+(condition-case err
+    (require 'semantic/wisent/comp)
+  (error (message "warning: error requiring 'semantic/wisent/comp"))
+  )
 
 (/*
 use Pod::Usage;
