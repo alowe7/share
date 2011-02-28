@@ -355,14 +355,44 @@ or override them by post-chaining.
     )
   )
 
-(defun find-parent-file ()
-  "visit the parent of this file see `chain-parent-file'"
+(defun config-ancestors (&optional module)
+  "returns the ancestor list of optional MODULE
+that is the list of modules of the same base name along load-path.  
+default value module is `this-load-file'
+"
 
-  (interactive)
-  (let ((f (chain-parent-file)))
-    (if (and f (file-exists-p f))
-	(find-file f)
-      (message "no parent found"))))
+  (let* ((module (or module (this-load-file)))
+	 (y (file-name-sans-extension (file-name-nondirectory module)))
+	 (dir (file-name-directory module))
+	 (l (loop
+	     for x in load-path 
+	     with z = nil
+	     when
+	     (or
+	      (file-exists-p (setq z (concat x "/" y ".elc")))
+	      (file-exists-p (setq z (concat x "/" y ".el"))))
+	     collect z)))
+    (cdr (member* dir l :test 'string-match))
+    )
+  )
+; (config-ancestors "c:/home/a/emacs/config/hosts/granite/keys.el")
+; (config-ancestors "c:/home/a/emacs/config/os/w32/keys.el")
+
+(defun find-config-parent (&optional module)
+  " visit the immediate parent of MODULE
+if there is a choice between compiled and source versions of the parent, prefer the source
+"
+  (let* (
+	 (module (or module (this-load-file)))
+	 (y (file-name-sans-extension (file-name-nondirectory module)))
+	 (l (config-ancestors module)))
+    (cond
+     ((file-exists-p (setq z (expand-file-name (concat y ".el") (file-name-directory (car l))))) z)
+     (t x))
+    )
+  )
+; (find-config-parent "c:/home/a/emacs/config/hosts/granite/keys.el")
+; (find-config-parent "c:/home/a/emacs/config/os/w32/keys.el")
 
 ; directory-files appears to have a bug matching arbitrary regexps.
 
