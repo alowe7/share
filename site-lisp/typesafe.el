@@ -81,16 +81,15 @@ prompt and default are evaluated exactly once.
   )
 ; (read-string* "foo (%s): " "bar")
 
-(defmacro read-file-name* (prompt &optional default)
+(defmacro read-file-name* (prompt &optional default dir initial)
   "interactively read for filename, prompting with PROMPT, with default value DEFAULT.
 prompt may have formatting strings in it, see `format'
 prompt and default are evaluated exactly once.
-also see `read-file-name'
-if default-insert-directory is set 
+additional args DIR and INITIAL are passed to `read-file-name'
 "
   `(let* ((*prompt* ,prompt)
 	  (*default* ,default)
-	  (*s* (read-file-name (format *prompt* *default*) nil (expand-file-name *default*))))
+	  (*s* (read-file-name (format *prompt* *default*) ,dir (expand-file-name *default*) nil ,initial)))
      (if (and (stringp *s*) (> (length *s*) 0)) *s* *default*)
      )
   )
