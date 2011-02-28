@@ -449,6 +449,12 @@ members may be symbols or strings, see `post-load'
 		(if *debug-config-error* (debug))))
   )
 
+;;
+;; load-path is set up.  load configuration specific initializations
+;;
+
+(load "common-init" t t)		; optional common initialization
+
 (or 
  (and (boundp 'window-system) (load (symbol-name window-system) t t))	; window system specific
  (and (getenv "TERM") (load (getenv "TERM") t t))		;terminal specific
