@@ -11,6 +11,9 @@ ship:
 	$(MAKE) --directory bin ship
 	$(MAKE) --directory site-lisp ship
 
+compile:
+	$(MAKE) --directory site-lisp compile
+
 test: FORCE
 	$(MAKE) --directory site-lisp test
 
