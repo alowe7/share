@@ -20,13 +20,13 @@ make-autoloads
 =head1 OPTIONS
 
                 --help                  print usage
-                --top <dir>                   top of directory tree where files are loaded from
-                --prefix <prefix>   optional prefix for alist (default=basename($top))
-                --version              print version
-                --force                 override previously autoloaded functions.
-                --compiled                 autoload function from compiled module
-                --sourcepath <path>                 add source path to `find-function-source-path'
-                --patterns <pat>                 additional patterns to autoload
+                --top=<dir>                   top of directory tree where files are loaded from
+                --prefix=<prefix>   optional prefix for alist (default=basename($top))
+                --version | -v              print version
+                --force | -f                 override previously autoloaded functions.
+                --compiled | -c                 autoload function from compiled module
+                --sourcepath=<path>                 add source path to `find-function-source-path'
+                --patterns=<pat>                 additional patterns to autoload
 
 =head1 EXAMPLES
 
