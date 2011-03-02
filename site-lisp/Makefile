@@ -27,7 +27,7 @@ XZFLAGS = -t1
 
 # everything in this directory is shippable
 CONFIG=config.el
-SOURCES=assoc-helpers.el buff.el buffers.el byte-compile-directory.el cat-seq.el cat-utils.el collect-directories.el completion.el ctl-backslash.el ctl-comma.el ctl-meta.el ctl-ret.el ctl-slash.el ctl-x-ctl-a.el dom.el eval-process.el fapropos.el fb.el filetime.el fixframe.el indicate.el input.el long-comment.el mktime.el nums.el other.el perl-command.el php-mode.el pod.el qsave.el roll.el scratch-mode.el sh.el string-utils.el svn-helpers.el syntax.el trim.el typesafe.el whence.el xa.el xpath-helpers.el xpath-parser.el xpath.el zap.el
+SOURCES:=$(shell find . -name "*.el")
 
 TARGETS := $(SOURCES:.el=.elc)
 
@@ -50,8 +50,8 @@ ship: compile autoloads
 autoloads: FORCE
 	$(MAKE_AUTOLOADS) --top $(PKGLISP) -c $(SOURCES) --sourcepath $(PWD) > $(AUTOLOADS)
 
-.xz.dat: $(SOURCES)
-	xz $(XZFLAGS) $^
+.xz.dat: FORCE
+	xz $(XZFLAGS) $(SOURCES)
 
 clean: FORCE
 	rm -f $(AUTOLOADS) *.elc .xz.dat
