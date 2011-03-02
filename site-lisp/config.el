@@ -387,13 +387,15 @@ if there is a choice between compiled and source versions of the parent, prefer 
 	 (module (or module (this-load-file)))
 	 (y (file-name-sans-extension (file-name-nondirectory module)))
 	 (l (config-ancestors module))
-	 (parent (cond
-		  ((file-exists-p (setq z (expand-file-name (concat y ".el") (file-name-directory (car l))))) z)
-		  (t x))))
+	 (parent (and l
+		      (cond
+		       ((file-exists-p (setq z (expand-file-name (concat y ".el") (file-name-directory (car l))))) z)
+		       (t x)))))
     (if (and (interactive-p) parent) (find-file parent) parent)
     )
   )
 ; (find-config-parent "c:/home/a/emacs/config/hosts/granite/keys.el")
+; (find-config-parent "c:/home/a/emacs/config/hosts/granite/post-xz.el")
 ; (find-config-parent "c:/home/a/emacs/config/os/w32/keys.el")
 
 ; directory-files appears to have a bug matching arbitrary regexps.
