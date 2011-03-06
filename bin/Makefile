@@ -6,4 +6,4 @@ LOCALBIN = /usr/local/bin
 .PHONY: FORCE
 
 ship: FORCE
-	$(INSTALL) -m 555 make-autoloads $(LOCALBIN)
+	$(INSTALL) -m 755 make-autoloads $(LOCALBIN)

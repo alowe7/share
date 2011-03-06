@@ -48,7 +48,7 @@ ship: compile autoloads
 	install -m 444 $(AUTOLOADS) $(SITESTART)
 
 autoloads: FORCE
-	$(MAKE_AUTOLOADS) --top $(PKGLISP) -c $(SOURCES) --sourcepath $(PWD) > $(AUTOLOADS)
+	$(MAKE_AUTOLOADS) --top=$(PKGLISP) --prefix=$(PKG) -c $(SOURCES) --sourcepath $(PWD) > $(AUTOLOADS)
 
 .xz.dat: FORCE
 	xz $(XZFLAGS) $(SOURCES)
