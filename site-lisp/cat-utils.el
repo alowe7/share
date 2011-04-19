@@ -72,24 +72,30 @@ removes empty strings unless optional third parameter KEEP-EMPTY-STRINGS is set
 	 )
        )
   )
+
 ; (assert (equal (split "abcd efgh, ijkl	mnop  " ) '("abcd" "efgh," "ijkl" "mnop")))
 ;  (assert (equal (split "foo;bar;baz" ?;) '("foo" "bar" "baz")))
 ;  (assert (equal  (split "-outline-Arial-bold-r-normal-normal-13-97-96-96-p-60-iso10646-1" "-" t) '("" "outline" "Arial" "bold" "r" "normal" "normal" "13" "97" "96" "96" "p" "60" "iso10646" "1")))
 ;  (assert (equal (split "foo,\"Tuesday, Jan 25 17:25:26 CST 2011\",bar" ",") '("foo" "\"Tuesday, Jan 25 17:25:26 CST 2011\"" "bar")))
 ;  (assert (equal (split "foo,bar,\"Tuesday, Jan 25 17:25:26 CST 2011\"" ",") '("foo" "bar" "\"Tuesday, Jan 25 17:25:26 CST 2011\"")))
 
-(defun split2 (s &optional pat)
-  "more scalable version of `split'
-except if PAT is not specifed, splits on newline, rather than all whitespace
+(defun splitf (s &optional pat)
+  "return the list of nonblank elements resulting from splitting STRING on regular expression PAT.
+basically more scalable version of `split' except if PAT is not specifed, splits on newline, rather than all whitespace
 "
   (let ((pat (or pat "\n"))
 	(pos 0) pos2 res)
     (while (setq pos2 (string-match pat s pos))
-      (push (substring s pos pos2) res)
+      (setq res (append res  (list (substring s pos pos2))))
       (setq pos (1+ pos2)))
-    res
+    (remove* "" (append res  (list (substring s pos))) :test 'string=)
     )
   )
+
+; (assert (equal (splitf "foo,bar,baz") (list "foo,bar,baz")))
+; (assert (equal (car (splitf "\"Nqpbpx, Wvz\"	1661	R140\n\"Ntarj, Pelfgny\"	3200	J134\n")) "\"Nqpbpx, Wvz\"	1661	R140"))
+; (assert (= 2 (length (splitf "\"Nqpbpx, Wvz\"	1661	R140\n\"Ntarj, Pelfgny\"	3200	J134\n"))))
+
 
 (defun splice (l1 l2)
   "join two lists L1 and L2 into an a-list consisting of the cars in each"
