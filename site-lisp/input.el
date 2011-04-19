@@ -95,11 +95,11 @@ with optional string CHARS, also matches specified characters.
 	   )
 
 	  (unless prompt-includes-help
-	    (setq prompt (format "%s (y to continue, n for next, q to quit loop%s): " prompt
+	    (setq prompt (format "%s (press y, n, or q%s): " prompt
 ;;			tbd handle vector of events using something like:
 ;; 	 (if (vectorp chars) (key-description ...)
 				 (if (string* chars)
-				     (concat ", or [" chars "]") "")
+				     (concat ", or one of [" chars "]") "")
 				 )
 		  prompt-includes-help t))
 	  )
@@ -108,6 +108,6 @@ with optional string CHARS, also matches specified characters.
     )
   )
 
-; (y-or-n-q-p "foo (%s)?" "xyz" "bar")
+; (y-or-n-q-p "foo (%s)?" "xz" "bar")
 
 (provide 'input)
