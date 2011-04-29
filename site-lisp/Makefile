@@ -40,6 +40,7 @@ sources:
 	@echo $(SOURCES)
 
 ship: compile autoloads
+	mkdir -p $(SITELISP)
 	install -m 444 $(CONFIGTARGET) $(SITELISP)
 	rm -rf $(PKGLISP)
 	mkdir -p $(PKGLISP)
