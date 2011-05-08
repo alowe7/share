@@ -4,19 +4,25 @@
 (require 'assoc-helpers)
 
 (defun fixed-font ()
-  (if (and (eq window-system 'x) (fboundp 'x-list-fonts))
-      (loop for page in '("iso8859" "iso10646") thereis
-	    (loop for size in '(14 12 10) thereis
-		  (loop for dpi in '(100 75) thereis
-			(let ((pat (format "-*-courier-medium-r-normal--%d-%d-*-*-m-*-%s-*" size dpi page)))
-			  (car (x-list-fonts pat))))))
+  (let ((font (when (and (eq window-system 'x) (fboundp 'x-list-fonts))
+		(loop for page in '("iso8859" "iso10646") thereis
+		      (loop for size in '(14 12 10) thereis
+			    (loop for dpi in '(100 75) thereis
+				  (let ((pat (format "-*-*-medium-r-normal--%d-%d-*-*-m-*-%s-*" size dpi page)))
+				    (car (x-list-fonts pat)))
+				  )
+			    )
+		      ))))
 
+    (or font
   ; just make one up
   ;    "-*-Courier-*-r-*-*-18-normal-*-*-*-*-*-*-"
-    ; "-*-Lucida Console-normal-r-*-*-15-normal-*-*-*-*-*-*-"
-    "-*-Consolas-normal-r-*-*-15-normal-*-*-*-*-*-*-"
+  ; "-*-Lucida Console-normal-r-*-*-15-normal-*-*-*-*-*-*-"
+	"-*-Consolas-normal-r-*-*-15-normal-*-*-*-*-*-*-"
+	)
     )
   )
+; (fixed-font)
 
 (defvar *fixed-frame-parameters*
  `((font  . ,(fixed-font)) (top . 100) (left . 100) (width . 100) (height . 30)))
