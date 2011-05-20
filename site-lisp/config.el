@@ -445,6 +445,7 @@ members may be symbols or strings, see `post-load'
      )
 
 ; these go at the head of the list
+; tbd -- deprecated with generated autoloads
 (mapc
  'add-to-load-path
  (list 
