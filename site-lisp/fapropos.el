@@ -1,5 +1,5 @@
 (put 'fapropos 'rcsid 
- "$Id: fapropos.el 890 2010-10-04 03:34:24Z svn $")
+ "$Id$")
 
 (require 'indicate)
 

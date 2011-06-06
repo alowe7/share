@@ -82,20 +82,6 @@ see `eval-process'
   (insert (funcall 'eval-process cmd args))
   )
 
-(defun read-file (f &optional chomp)
-  "returns contents of FILE as a string
-with optional second arg CHOMP, applies `chomp' to the result
-" 
-  (and f (file-exists-p f)
-       (save-window-excursion
-	 (let ((b (zap-buffer " *tmp*")) s)
-	   (insert-file-contents f)
-	   (setq s (buffer-string))
-	   (kill-buffer b)
-	   (if chomp s (chomp s)))
-	 )
-       )
-  )
 
 ;; todo -- rewrite to use &rest
 

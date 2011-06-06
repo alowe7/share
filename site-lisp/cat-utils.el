@@ -189,4 +189,18 @@ adds to tail of PLACE THING
   (chomp (thing-at-point (quote line)))
   )
 
+(defun read-file (f &optional chomp)
+  "returns contents of FILE as a string
+with optional second arg CHOMP, applies `chomp' to the result
+" 
+  (and f (file-exists-p f)
+       (with-temp-buffer
+	 (insert-file-contents f)
+	 (if chomp
+	     (chomp (buffer-string))
+	   (buffer-string)
+	   ))
+       )
+  )
+
 (provide 'cat-utils)

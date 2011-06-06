@@ -1,5 +1,5 @@
 (put 'cat-seq 'rcsid
- "$Id: cat-seq.el 890 2010-10-04 03:34:24Z svn $")
+ "$Id$")
 
 (require 'cat-utils)
 

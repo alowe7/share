@@ -1,5 +1,5 @@
 (put 'fb 'rcsid 
- "$Id: fb.el 903 2010-11-14 19:12:52Z alowe $")
+ "$Id$")
 
 ; (require 'locate)
 (require 'cat-utils)

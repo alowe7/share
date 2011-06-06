@@ -1,5 +1,5 @@
 (put 'config 'rcsid 
- "$Id: config.el 937 2011-01-09 20:40:38Z a $")
+ "$Id$")
 
 (require 'advice)
 (require 'cl)
@@ -398,22 +398,6 @@ if there is a choice between compiled and source versions of the parent, prefer 
 ; (find-config-parent "c:/home/a/emacs/config/hosts/granite/post-xz.el")
 ; (find-config-parent "c:/home/a/emacs/config/os/w32/keys.el")
 
-; directory-files appears to have a bug matching arbitrary regexps.
-
-(defun get-directory-files (&optional directory full match)
-  "return directory contents as a list of strings, excluding . and ..
-see `directory-files'
-"
-  (interactive "sName: ")
-
-  (loop for x in 
-	(directory-files (or directory ".") full match)
-	when 
-	(let ((z (file-name-nondirectory x)))
-	  (not (or (string= z ".") (string= z ".."))))
-	collect x)
-  )
-
 (defvar hooked-preloaded-modules nil
   "list of preloaded modules.  if there's any load-hooks for these, they need to be run at init time
 members may be symbols or strings, see `post-load'
@@ -440,7 +424,12 @@ members may be symbols or strings, see `post-load'
 (require 'find-func)
 (and share
      (let ((site-start.d (concat share "/site-lisp/site-start.d")))
-       (mapc '(lambda (f) (load f t t)) (and (file-directory-p site-start.d) (get-directory-files site-start.d)))
+       (mapc
+	'(lambda (f) (load f t t))
+	(and (file-directory-p site-start.d)
+	     (remove* '("." "..") (directory-files site-start.d) :test '(lambda (x y) (member* y x :test (quote string=))))
+	     )
+	)
        )
      )
 
