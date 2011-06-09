@@ -25,23 +25,20 @@ XZFLAGS = -t1
 
 .PHONY: FORCE
 
-# everything in this directory is shippable
-CONFIG=config.el
-SOURCES:=$(shell find . -name "*.el")
+# almost everything in this directory is shippable
+SOURCES:=$(shell find  . -name "*.el" -a ! -name "byte-compile-directory.el")
 
 TARGETS := $(SOURCES:.el=.elc)
 
-# config target needs to get installed above pkglisp
-CONFIGTARGET := $(CONFIG:.el=.elc)
 
 all:
 
 sources:
 	@echo $(SOURCES)
 
-ship: compile autoloads
-	mkdir -p $(SITELISP)
-	install -m 444 $(CONFIGTARGET) $(SITELISP)
+ship: compile autoloads pkglisp
+
+pkglisp: FORCE
 	rm -rf $(PKGLISP)
 	mkdir -p $(PKGLISP)
 	install -m 444 $(TARGETS) $(PKGLISP)

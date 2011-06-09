@@ -1,10 +1,12 @@
 (put 'config 'rcsid 
- "$Id$")
+ "$Id: config.el 80 2011-06-06 04:18:56Z alowe $")
+
+(eval-when-compile (setq byte-compile-warnings '(not cl-functions)))
 
 (require 'advice)
 (require 'cl)
 
-(setq *debug-config-error* t)
+(defvar *debug-config-error* t)
 
 (defvar *configdir* "~/emacs/config/")
 
@@ -372,7 +374,7 @@ default value module is `this-load-file'
 	      (file-exists-p (setq z (concat x "/" y ".elc")))
 	      (file-exists-p (setq z (concat x "/" y ".el"))))
 	     collect z)))
-    (cdr (member* dir l :test 'string-match))
+    (cdr (member dir l))
     )
   )
 ; (config-ancestors "c:/home/a/emacs/config/hosts/granite/keys.el")
@@ -388,9 +390,8 @@ if there is a choice between compiled and source versions of the parent, prefer 
 	 (y (file-name-sans-extension (file-name-nondirectory module)))
 	 (l (config-ancestors module))
 	 (parent (and l
-		      (cond
-		       ((file-exists-p (setq z (expand-file-name (concat y ".el") (file-name-directory (car l))))) z)
-		       (t x)))))
+		      (let ((z (expand-file-name (concat y ".el") (file-name-directory (car l))))) (and (file-exists-p z) z))))
+	 )
     (if (and (interactive-p) parent) (find-file parent) parent)
     )
   )
@@ -422,16 +423,19 @@ members may be symbols or strings, see `post-load'
 
 ; load any init files out there
 (require 'find-func)
-(and share
-     (let ((site-start.d (concat share "/site-lisp/site-start.d")))
-       (mapc
-	'(lambda (f) (load f t t))
-	(and (file-directory-p site-start.d)
-	     (remove* '("." "..") (directory-files site-start.d) :test '(lambda (x y) (member* y x :test (quote string=))))
-	     )
-	)
+(defvar *site-start-load-history* nil)
+(setq  *site-start-load-history*
+       (and share
+	    (let ((site-start.d (concat share "/site-lisp/site-start.d")))
+	      (mapc
+	       '(lambda (f) (load f t t))
+	       (and (file-directory-p site-start.d)
+		    (remove* '("." "..") (directory-files site-start.d) :test '(lambda (x y) (member y x)))
+		    )
+	       )
+	      )
+	    )
        )
-     )
 
 ; these go at the head of the list
 ; tbd -- deprecated with generated autoloads
@@ -439,15 +443,13 @@ members may be symbols or strings, see `post-load'
  'add-to-load-path
  (list 
   (expand-file-name  "common" *configdir*)
+  (expand-file-name (concat (format "%d" emacs-major-version)) *configdir*)
+  (expand-file-name (concat (format "%d.%d" emacs-major-version emacs-minor-version)) *configdir*)
   (expand-file-name (concat "os/" system-configuration)  *configdir*)
   (expand-file-name (concat "os/" (symbol-name window-system)) *configdir*)
   (expand-file-name (concat "hosts/"  (system-name)) *configdir*)
-  (expand-file-name (concat (format "%d.%d" emacs-major-version emacs-minor-version)) *configdir*)
-
-  (expand-file-name (concat (format "%d" emacs-major-version)) *configdir*)
   )
  )
-
 
 ; todo -- put this logic on a eval when loaded form?
 (condition-case x
@@ -469,7 +471,7 @@ members may be symbols or strings, see `post-load'
 	     (getenv "EMACSPATH")
 	     emacs-version)))
 
-  (error (progn (message "some kind of random error in %s" (if load-in-progress load-file-name (buffer-file-name))) 
+  (error (progn (message "some kind of shouldn't happen error in %s" (if load-in-progress load-file-name (buffer-file-name))) 
 		(if *debug-config-error* (debug))))
   )
 
