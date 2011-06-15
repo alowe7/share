@@ -1,0 +1,6 @@
+(setq s-autoload-alist '( 
+;  ./test/mintest.el
+(check-if-advised "/whatever/test/mintest.el")
+(toggle-advise "/whatever/test/mintest.el")
+))
+(mapcar '(lambda (x) (let ((fn (condition-case x (symbol-function  (car x)) (error nil)))) (and (null fn) (autoload (car x) (cadr x) nil t)))) s-autoload-alist)

@@ -96,7 +96,8 @@ $alist_symbol=$prefix . "autoload-alist";
 # todo: grab doc strings too
 %autoloads=();
 
-$defpat="(defun\*|defun|defmacro|define-derived-mode|fset|defalias)";
+my $defpat="(\\( *defun\*|\\( *defun|\\( *defmacro|\\( *define-derived-mode|\\( *fset|\\( *defalias|\;* *autoload)";
+my $func, $pos;
 
 print "(setq $alist_symbol '( \n";
 
@@ -121,10 +122,12 @@ foreach $fn (@ARGV) {
 	    print ";  $fn\n";
 	    foreach (<F>) {
 		# this intentionally requires defuns to start in column 1 to miss false positives
-		if (/^\($defpat/o) {
-		    ($pat, $func)=split;
+		chomp;
+		if (/^$defpat/go) {
+		    $pos=pos($_);
+		    ($func)=split(' ', substr($_, $pos));
 		    # in case open paren is stuck to identifier
-		    $func =~ s/[()]//g;
+#		    $func =~ s/[()]//g;
 		    # fset and defalias require quoted args
 		    if ($1 =~ /fset|defalias/o) {
 			$func=~s/^\'//;
@@ -135,7 +138,7 @@ foreach $fn (@ARGV) {
 			print "; ($func \"$f\")\n";
 		    }
 		    else {
-			print "($func \"$f\")\n";
+			printf "(%s \"%s\")\n", $func, $f;
 			$autoloads{$func}=$f 
 			}
 		}
