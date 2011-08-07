@@ -158,40 +158,51 @@ args is a list with car = 'eval
 
 (defun perl-command (s &rest args)
   " run perl script S on ARGS returning stdout as a string.
-stderr is available on the file `*stderr*' 
-so for example use (read-stderr) to inspect it.
+if called interactively, visits a buffer containing stdout.
+
+returns nil if script cannot be found.
+if an error occurs excuting the script, raises `error' with with the contents of stderr.
 " 
   (interactive "sperl script: ")
 
   (let* ((b (get-buffer-create-1 *perl-stdout*))
 	 (e (stderr))
-	 (fs (find-script s)))
+	 (fs (find-script s))
+	 ret)
 
     (unless fs (error "%s script not found" s))
 
     (cond ((not fs)
 	   (message "warning: script %s not found" s)
 	   nil)
-	  ((apply 'call-process
-		  (nconc
-		   (list *perl-command* nil (list b e) nil fs)
-		   (remove* nil args)))
-	   (prog1 
-	       (cond ((interactive-p) 
-		      (switch-to-buffer b) 
-		      (goto-char (point-min)))
-		     (t 
-		      (with-current-buffer b
-			(chomp (buffer-string))))
-		     )
-	     (let ((ret (read-stderr e)))
-	       (and ret (message ret)))
+	  (t
+	   (setq ret (apply 'call-process
+			    (nconc
+			     (list *perl-command* nil (list b e) nil fs)
+			     (remove* nil args))))
+	   (cond 
+	    ((= ret 0)
+	     (cond ((interactive-p) 
+		    (switch-to-buffer b) 
+		    (goto-char (point-min)))
+		   (t 
+		    (with-current-buffer b
+		      (chomp (buffer-string))))
+		   )
 	     )
+	    (t
+	     (let ((err (read-stderr e)))
+	       (delete-file e)
+	       (and (string* err) (error (concat "\n" err "\n")))
+	       )
+	     )
+	    )
 	   )
-	  (t (message (read-stderr e))))
+	  )
     )
   )
-; (perl-command "/z/pl/phoneword")
+; (perl-command "/z/pl/phoneword" "9433")
+; (perl-command "twcfg")
 
 (defun perl-command-region (start end s &optional delete buffer display &rest args)
   " run perl script S on REGION with ARGS.

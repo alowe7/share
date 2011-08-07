@@ -5,11 +5,9 @@ VERSION = 1.0
 SHELL=/bin/sh
 INSTALL = install
 SHARE = /usr/share/emacs
-PKG=x
 SITELISP = $(SHARE)/site-lisp
-PKGLISP = $(SITELISP)/$(PKG)-$(VERSION)
 SITESTART = $(SITELISP)/site-start.d
-AUTOLOADS=$(PKG)-autoloads
+PWD=$(shell pwd)
 
 ifneq ($(strip $(EMACSPATH)),)
 EMACS := $(EMACSPATH)/emacs
@@ -17,38 +15,28 @@ else
 EMACS := $(shell which emacs  2> /dev/null)
 endif
 
-
-PWD=$(shell pwd)
-MAKE_AUTOLOADS=../bin/make-autoloads
-
-XZFLAGS = -t1
-
 .PHONY: FORCE
 
 # everything in this directory is shippable
 CONFIG=config.el
-SOURCES:=$(shell find . -name "*.el")
+CONFIGINIT=config-init.el
 
-TARGETS := $(SOURCES:.el=.elc)
-
-# config target needs to get installed above pkglisp
 CONFIGTARGET := $(CONFIG:.el=.elc)
 
 all:
 
-sources:
-	@echo $(SOURCES)
-
-ship: compile config
-
-config: FORCE
+ship: compile init
 	mkdir -p $(SITELISP)
 	install -m 444 $(CONFIGTARGET) $(SITELISP)
+	install -m 444 $(CONFIGINIT) $(SITESTART)
+
+init: FORCE
+	@echo "(add-to-list 'find-function-source-path \"$(PWD)\")" > $(CONFIGINIT)
 
 clean: FORCE
-	rm -f $(AUTOLOADS) *.elc 
+	rm -f *.elc config-init.el
 
-compile:
+compile: FORCE
 ifeq ($(strip $(EMACS)),)
 	@echo "EMACS not found"
 else

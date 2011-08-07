@@ -135,6 +135,12 @@ with arg, prompt for number.
   "convert region of text to hex"
   (ascii2 (buffer-substring beg end)))
 
+(defvar *number-lines-separator* ". ")
+(defun number-lines-separator (sep)
+  (interactive "sseparator for number-lines: ")
+  (setq *number-lines-separator* sep)
+  )
+
 (defun number-lines (&optional beg end base column separator zeros)
   " insert line numbers in region starting at optional number BASE.
   if called interactively line numbers are inserted at the current column (default 0)
@@ -144,7 +150,7 @@ when called from a program, arguments are BEG END BASE COLUMN SEPARATOR ZEROS
 BEG and END are character positions defining the operand region 
 BASE indicates the starting line number
 COLUMN defines where on the line the number appears
-SEPARATOR seperates the number from the line
+SEPARATOR seperates the number from the line (default: `*number-lines-separator*')
 ZEROS if set, line number includes leading zeros
 "
   (interactive "P")
@@ -157,7 +163,7 @@ ZEROS if set, line number includes leading zeros
 	 (q (if (interactive-p) (max (point) (mark)) (max beg end)))
 	 (z (+ i (count-lines p q)))
 	 (goal-column (or column goal-column (current-column)))
-	 (separator (or separator ". "))
+	 (separator (or separator *number-lines-separator*))
 	 (iformat (if zeros "%03d" "%d"))
 	 )
 
@@ -165,7 +171,7 @@ ZEROS if set, line number includes leading zeros
       (move-to-column goal-column t)
 
       (while (< i z)
-	(insert (concat (format iformat i) separator)) 
+	(insert (concat (format iformat i) *number-lines-separator*)) 
 	(forward-line 1)
 	(setq i (1+ i))
 	)

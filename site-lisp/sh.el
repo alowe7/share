@@ -56,7 +56,7 @@ thing is `$' expanded
 (defun -z (x) "THING is null or string of zero length" (or (null x) (= 0 (length ($ x)))))
 (defun -n (x) "THING is neither null nor a string of zero length" (not (-z x)))
 
-(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
+(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]_]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
 
 (defvar *comment-regexp* "^[[:blank:]]*#" "regexp matching a shell comment")
 
@@ -69,7 +69,7 @@ thing is `$' expanded
 "
 
   (cond
-   ((string-match  *comment-regexp* line) nil)
+   ((string-match *comment-regexp* line) nil)
    ((string-match *assignment-regexp* line)
     (let ((name (match-string 2 line)) (value (match-string 3 line)))
       (setenv name ($ value))
