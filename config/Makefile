@@ -28,6 +28,7 @@ all:
 ship: compile init
 	mkdir -p $(SITELISP)
 	install -m 444 $(CONFIGTARGET) $(SITELISP)
+	mkdir -p $(SITESTART)
 	install -m 444 $(CONFIGINIT) $(SITESTART)
 
 init: FORCE

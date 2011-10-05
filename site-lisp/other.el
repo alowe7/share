@@ -29,13 +29,16 @@
 	)
   )
 
-(defvar *wide-screen* 1280 "if `display-pixel-width` is greater than this, assume you have two monitors")
+; (defvar *wide-screen* 1280 "if `display-pixel-width` is greater than this, assume you have two monitors")
+(defvar *wide-screen* 1680 "if `display-pixel-width` is greater than this, assume you have two monitors")
 
 (defun other-zero () 
 " find the zero coordinate of the other screen, if there is one.  tolerates multiple monitors"
   (if (and (> (display-pixel-width) *wide-screen*)
   ; its a wide-screen
-	   (not (> (frame-parameter nil 'left)  *wide-screen*) ))
+	   (let* ((zero (frame-parameter nil 'left))
+		  (zero* (if (listp zero) (eval zero) zero)))
+	     (not (> zero*  *wide-screen*) )))
   ; currently on screen 1; zero is on screen 2
       (1+ *wide-screen*)
     0
