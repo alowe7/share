@@ -122,7 +122,7 @@ no errors if files don't exist.
 	))
   )
 ; (if (ad-is-advised 'load) (ad-unadvise 'load))
-; (setq *debug-post-load-hook* t  *debug-post-load-hook* t)
+; (setq *debug-post-load-hook* t)
 
 
 (defadvice load-with-code-conversion (around 
