@@ -109,7 +109,12 @@ return list of command evaluation values with nil removed
   "scan FILE as a shell script.
 return nil if file does not exist or cannot be read.  else returns the filename
 "
+
+  (interactive (list 
+		(read-file-name* (format "file to scan (%s): " (thing-at-point 'filename)) (thing-at-point 'filename))))
+		   
   (if (-r fn) (scan-file fn))
+
   )
 
 ; (scan-file-p (expand-file-name "~/.private/.zdbrc"))
