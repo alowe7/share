@@ -95,6 +95,27 @@ additional args DIR and INITIAL are passed to `read-file-name'
   )
 ; (read-file-name* "foo(%s): " "bar")
 
+(defmacro read-directory-name* (prompt &optional default dir initial)
+  "interactively read for directoryname, prompting with PROMPT, with default value DEFAULT.
+prompt may have formatting strings in it, see `format'
+prompt and default are evaluated exactly once.
+additional args DIR and INITIAL are passed to `read-directory-name'
+"
+  `(let* ((*prompt* ,prompt)
+	  (*dir* ,dir)
+	  (*default* (expand-file-name ,default *dir*))
+	  (*s* (read-directory-name (format *prompt* *default*) *dir* (expand-file-name *default*) nil ,initial))
+	  (*ret*  (expand-file-name *s* ,dir))
+	  )
+     (if (and (stringp *ret*) (> (length *ret*) 0)) *ret* *default*)
+     )
+  )
+; (read-directory-name* "foo(%s): " "bar" "/tmp")
+; (read-directory-name* "foo(%s): " "bar")
+
+
+
+
 (defmacro completing-read* (prompt table &optional default rest)
   "interactively read for string, prompting with PROMPT, completing from LIST with default value DEFAULT.
 optional ARGS may be a list of args for `completing-read'
