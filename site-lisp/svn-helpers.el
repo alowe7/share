@@ -537,5 +537,6 @@ but also ensure svn:keywords property contains Id
 ; (call-interactively 'svn-keyword-cleanup)
 
 
-(define-key vc-prefix-map "p" (svn-pl (thing-at-point 'file)))
+(define-key vc-prefix-map "p" '(lambda () (interactive) (message (chomp (pp (svn-pl (thing-at-point 'file)))))))
 
+(provide 'svn-helpers)

@@ -83,7 +83,7 @@ prompt and default are evaluated exactly once.
 
 (defmacro read-file-name* (prompt &optional default dir initial)
   "interactively read for filename, prompting with PROMPT, with default value DEFAULT.
-prompt may have formatting strings in it, see `format'
+prompt may have exactly one formatting string, populated with default value, if present. see `format'.
 prompt and default are evaluated exactly once.
 additional args DIR and INITIAL are passed to `read-file-name'
 "
