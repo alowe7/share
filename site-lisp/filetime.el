@@ -4,21 +4,45 @@
 (require 'eval-process)
 
 (defun filemodtime (f)
-  (and f (elt (file-attributes f) 5)))
+  "returns last modified time of FILE
+see `file-attributes'
+"
+  (and f (elt (file-attributes f) 5))
+  )
+; (filemodtime "filetime.el")
+
 (defun fileacctime (f)
-  (and f (elt (file-attributes f) 4)))
+  "returns last accessed time of FILE
+see `file-attributes'
+"
+  (and f (elt (file-attributes f) 4))
+  )
+; (fileacctime "filetime.el")
 
 (defun compare-filetime (a b)
   "compare file times A and B.
- returns -1 if A preceeds B, 0 if they're equal, 1 otherwise "
-  (cond ((null (or a b)) 0)
-	((null a) -1)
-	((null b) 1)
-	((< (car a) (car b)) -1)
-	((> (car a) (car b)) 1)
-	((< (cadr a) (cadr b)) -1)
-	((> (cadr a) (cadr b)) 1)
-	(t 0)))
+ returns -1 if A preceeds B, 0 if they're equal, 1 otherwise 
+
+kludgy feature: A and/or B may be strings, if so they are assumed to be filenames, if so use `filemodtime' of file
+"
+
+  (let ((a (if (and (stringp a) (file-exists-p a)) (filemodtime a) a))
+	(b (if (and (stringp b) (file-exists-p b)) (filemodtime b) b)))
+    (cond ((null (or a b)) 0)
+	  ((null a) -1)
+	  ((null b) 1)
+	  ((< (car a) (car b)) -1)
+	  ((> (car a) (car b)) 1)
+	  ((< (cadr a) (cadr b)) -1)
+	  ((> (cadr a) (cadr b)) 1)
+	  (t 0))
+    )
+  )
+;  (assert (= 0 (compare-filetime "filetime.el" "filetime.el")))
+;  (assert (= 0 (compare-filetime "filetime.el" (filemodtime "filetime.el"))))
+;  (assert (= 0 (compare-filetime (filemodtime "filetime.el") "filetime.el")))
+;  (assert (= 0 (compare-filetime (filemodtime "filetime.el") (filemodtime "filetime.el"))))
+; (assert (not (= 0 (compare-filetime "filetime.el" "/var/log/messages"))))
 
 (defun ftime () (interactive)
   "display formatted time string last modification time of file for current buffer"
