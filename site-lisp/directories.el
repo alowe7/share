@@ -6,8 +6,14 @@
 ; directory-files appears to have a bug matching arbitrary regexps.
 
 (defun get-directory-files (&optional directory full match predicate)
-  "return directory contents as a list of strings, excluding . and ..
-see `directory-files'
+  "Return a list of names of files in DIRECTORY.
+There are three optional arguments:
+If FULL is non-nil, return absolute file names.  Otherwise return names
+ that are relative to the specified directory.
+If MATCH is non-nil, mention only file names that match the regexp MATCH.
+if PREDICATE is non-nil, it is a predicate of two arguments: (filename directory) returning non-nil if argument is to be included in resule
+
+this function differs from `directory-files' in the nature of the predicate argument and that it excludes dot (.) and dotdot (..) by defauls
 "
   (interactive "sName: ")
 
