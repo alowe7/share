@@ -6,20 +6,46 @@
 (require 'cat-utils)
 
 ;; sh -- bain-damaged interpreter for shell scripts
+(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]_]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
+
+(defvar *comment-regexp* "^[[:blank:]]*#" "regexp matching a shell comment")
+
+(defvar *backquote-regexp* "\`\\(.*\\)\`" "regexp matching a backquote expression")
+
+(defvar *quote-regexp* "\"\\(.*\\)\"" "regexp matching a quoted expression")
+
+;; reduced to support just exports, because this is a REALLY BAD IDEA
+
+(defvar *sh-custom-parser* nil "assign to a function that can handle additional shell command lines")
 
 ; note: this might get redefined should you ever load doctor.el
-(defun $ (filename) 
+(defun $ (value) 
   "Substitute environment variables referred to in FILENAME.
 "
+  ;; values may be computed expressions
+  (when (and (string* value) (string-match *backquote-regexp* value))
+    (setq value (eval-shell-command (concat "echo " value)))
+    )
 
-  (and  
-   (string* filename)
-   (substitute-in-file-name filename)
-   )
+  ;; filepaths with spaces often have extra doublequotes around them to disambiguate them in shell scripts; remove those
+  (when (and (string* value) (string-match *quote-regexp* value))
+    (let ((exp (match-string 1 value)))
+      (when (string* exp)
+	(setq value exp)
+	)
+      ))
+
+
+  (when (string* value)
+    (setq value (substitute-in-file-name value))
+    )
+
+  value
   )
 ; (assert (not ($ nil)))
 ; (assert (progn (setenv "foo" "bar")  (string= ($ "$foo") "bar")))
 ; (assert (progn (setenv "foo" "baz") (setenv "bar" "bo")  (string= ($ "$foo:$bar") "baz:bo")))
+; (assert (string= ($ "`cygpath -u \\`regtool get '/machine/SOFTWARE/Perl/BinDir'\\` | sed -e 's/\\/perl.exe//'`") "/Perl/bin"))
 
 (defun ! (x) (not x))
 
@@ -56,14 +82,6 @@ thing is `$' expanded
 (defun -z (x) "THING is null or string of zero length" (or (null x) (= 0 (length ($ x)))))
 (defun -n (x) "THING is neither null nor a string of zero length" (not (-z x)))
 
-(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]_]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
-
-(defvar *comment-regexp* "^[[:blank:]]*#" "regexp matching a shell comment")
-
-;; reduced to support just exports, because this is a REALLY BAD IDEA
-
-(defvar *sh-custom-parser* nil "assign to a function that can handle additional shell command lines")
-
 (defun sh-parse-line (line)
   "line contains a complete shell command.  turn it into emacs stuff.
 "
@@ -74,6 +92,11 @@ thing is `$' expanded
     (let ((name (match-string 2 line)) (value (match-string 3 line)))
       (setenv name ($ value))
       (format "%s=%s" name value)))
+   ((string-match *backquote-regexp* line)
+    (let ((exp (match-string 1 line)))
+      (eval-shell-command (format "echo %s" exp))
+      )
+    )
    ((and *sh-custom-parser* (listp *sh-custom-parser*))
     (loop for parser in *sh-custom-parser* thereis 
 	  (apply *sh-custom-parser* (list line))))
@@ -87,6 +110,11 @@ thing is `$' expanded
 ; (assert (progn (sh-parse-line "foo=baz") (string= ($ "$foo") "baz")))
 ; (assert (progn (sh-parse-line "export foo = bar") (string= ($ "$foo") "bar")))
 ; (assert (progn (sh-parse-line "foo=") (string= ($ "$foo") "bar")))
+
+; for the following example, see: (progn (find-file (expand-file-name ".bashrc" (host-config))) (goto-char (point-min)) (search-forward "PERL_HOME"))
+; (progn (sh-parse-line "`cygpath -u \\`regtool get '/machine/SOFTWARE/Perl/BinDir'\\` | sed -e 's/\\/perl.exe//'`")  (getenv "PERL_HOME"))
+
+
 
 (defun sh-parse-indicated-line ()
   (interactive)
