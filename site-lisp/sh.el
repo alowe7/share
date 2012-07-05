@@ -6,7 +6,7 @@
 (require 'cat-utils)
 
 ;; sh -- bain-damaged interpreter for shell scripts
-(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]_]+\\)[[:blank:]]*=[[:blank:]]*\\(.+\\)" "regexp matching an assignment statement")
+(defvar *assignment-regexp* "[[:blank:]]*\\(export\\)?[[:blank:]]*\\([[:word:]_]+\\)[[:blank:]]*=[[:blank:]]*\\(.*\\)" "regexp matching an assignment statement")
 
 (defvar *comment-regexp* "^[[:blank:]]*#" "regexp matching a shell comment")
 
@@ -14,9 +14,16 @@
 
 (defvar *quote-regexp* "\"\\(.*\\)\"" "regexp matching a quoted expression")
 
+(defvar *conditional-regexp* "^[[:blank:]]*\\(if\\)[[:blank:]]+" "regexp matching a conditional statement")
+(defvar *end-conditional-regexp*  "[[:blank:]]*\\(fi\\)[[:blank:]]*$" "regexp matching a conditional statement")
+(defvar *sh-ignore-conditional* nil)
+
 ;; reduced to support just exports, because this is a REALLY BAD IDEA
 
 (defvar *sh-custom-parser* nil "assign to a function that can handle additional shell command lines")
+
+(defvar debug-parse-line t)
+(defvar debug-scan-file t)
 
 ; note: this might get redefined should you ever load doctor.el
 (defun $ (value) 
@@ -87,6 +94,17 @@ thing is `$' expanded
 "
 
   (cond
+   (*sh-ignore-conditional* nil)
+   ((string-match *conditional-regexp* line)
+    (unless (string-match *end-conditional-regexp* line) ; one liner
+      (setq *sh-ignore-conditional* t)))
+   ((string-match *end-conditional-regexp* line)
+    (unless *sh-ignore-conditional* 
+      (message "sh warning: *end-conditional-regexp* found, with no matching *conditional-regexp* (%s)" line)
+    (when debug-parse-line (debug))
+      )
+    (setq *sh-ignore-conditional* nil)
+    )
    ((string-match *comment-regexp* line) nil)
    ((string-match *assignment-regexp* line)
     (let ((name (match-string 2 line)) (value (match-string 3 line)))
@@ -101,7 +119,7 @@ thing is `$' expanded
     (loop for parser in *sh-custom-parser* thereis 
 	  (apply *sh-custom-parser* (list line))))
 
-   ((functionp *sh-custom-parser*) 
+   ((and *sh-custom-parser* (functionp *sh-custom-parser*) )
     (apply *sh-custom-parser* (list line)))
    )
   )
@@ -109,7 +127,9 @@ thing is `$' expanded
 ; (assert (progn (sh-parse-line "foo=baz") (sh-parse-line "# foo=bar") (string= ($ "$foo") "baz")))
 ; (assert (progn (sh-parse-line "foo=baz") (string= ($ "$foo") "baz")))
 ; (assert (progn (sh-parse-line "export foo = bar") (string= ($ "$foo") "bar")))
-; (assert (progn (sh-parse-line "foo=") (string= ($ "$foo") "bar")))
+; (assert (progn (sh-parse-line "foo=") (string= ($ "$foo") "")))
+; (assert (progn (sh-parse-line "foo=") (sh-parse-line "if [ $? -eq 0]; then foo=baz; fi") (string= ($ "$foo") "")))
+; (assert (progn (mapcar 'sh-parse-line '("foo=" "if [ $? -eq 0]; then" "foo=baz;" "fi")) (string= ($ "$foo") "")))
 
 ; for the following example, see: (progn (find-file (expand-file-name ".bashrc" (host-config))) (goto-char (point-min)) (search-forward "PERL_HOME"))
 ; (progn (sh-parse-line "`cygpath -u \\`regtool get '/machine/SOFTWARE/Perl/BinDir'\\` | sed -e 's/\\/perl.exe//'`")  (getenv "PERL_HOME"))
@@ -130,6 +150,10 @@ return list of command evaluation values with nil removed
 "
   (interactive "ffilename: ")
   (remove* nil (mapcar 'sh-parse-line (split (read-file fn) "\C-j")))
+  (if *sh-ignore-conditional* 
+      (error "sh: *sh-ignore-conditional* still set after parse of file %s" fn)
+    (when debug-scan-file (debug))
+    (setq *sh-ignore-conditional* nil))
   )
 ; (scan-file (expand-file-name "~/.private/.xdbrc"))
 
