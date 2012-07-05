@@ -58,16 +58,16 @@
   )
 
 
-(defvar obstack '(obarray))
+(defvar *obstack* '(obarray))
 
 (defun push-obstack (x)
   (interactive (list (completing-read "obarray: " '(("obarray") ("c-obarray")) nil t)))
-  (setq obstack (eval (intern x))))
+  (setq *obstack* (eval (intern x))))
 
 
 (defun fapropos (pat &rest array)
   "a version of apropos that actually works.
-default behavior is to search all obarrays in obstack for REGEXP.
+default behavior is to search all obarrays in `*obstack*' for REGEXP.
 interactively with prefix arg, searches emacs obarray.
 called from a program, optional args are:
 REGEXP OBARRAY
@@ -78,7 +78,7 @@ fapropos will only find symbols which have already been interned
   (interactive (op-arg  "fapropos (%s): "))
   (let* ((default-array 
 	   (or array (cdr (assoc major-mode fapropos-alist))
-	       obstack))
+	       *obstack*))
 	 (b (zap-buffer "*Help*"))
 	 (w (get-buffer-window b))
 	 (val (and pat (> (length pat) 0) (fapropos1 pat default-array)))
@@ -86,7 +86,7 @@ fapropos will only find symbols which have already been interned
 
     (if val
 	(progn
-	  (setq obstack default-array)
+	  (setq *obstack* default-array)
 	  (or (and w (select-window w))
 	      (switch-to-buffer-other-window b))
 	  (insert val)

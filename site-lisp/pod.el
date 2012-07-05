@@ -6,7 +6,7 @@
 
 ; functions to facilitate using pod from emacs
 
-(defvar pod2text (find-script "pod2text"))
+(defvar *pod2text* (find-script "pod2text"))
 
 (defun pod2text (f &optional buffer)
   "find pod for FILE in optional BUFFER"
@@ -15,7 +15,7 @@
 		  (t (get-buffer-create-1 (or buffer "*pod*"))))))
     (set-buffer b)
     (insert 
-     (perl-command pod2text f))
+     (perl-command *pod2text* f))
 
   ; if window is visible in another frame, then raise it
     (if (and (not (get-buffer-window b))  

@@ -145,7 +145,7 @@ The R column contains a % for buffers that are read-only."
 
 (defun get-mode ()
   (let ((m (completing-read* (format "mode (%s): " major-mode)
-			    (mapcar '(lambda (x) 
+			    (mapcar #'(lambda (x) 
 				       (cons
 					(format "%s" x) x))
 				    (functions-like "-mode$")

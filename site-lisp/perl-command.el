@@ -5,7 +5,7 @@
 (require 'cl)
 (require 'eval-process)
 
-(defvar semicolon (read "?;"))
+(defconst *semicolon* (read "?;"))
 
 (defvar *perl-command* "perl")
 (defvar *perl-stdout* " *stdout*")
