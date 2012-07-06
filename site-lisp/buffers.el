@@ -58,12 +58,8 @@ when called interactively, displays a pretty list"
 	  for x being the buffers 
 	  if (eq (progn (set-buffer x) major-mode) mode) 
 	  collect x)))
-    (if (interactive-p) 
-	(let ((b (zap-buffer "*Buffer List*")))
-	  (set-buffer b)
-	  (dolist (x l) (insert (buffer-name x) "\n"))
-	  (pop-to-buffer b))
-      l)))
+    )
+  )
 
 (defun collect-buffers-named (pat)
   "list buffers with names matching PAT"

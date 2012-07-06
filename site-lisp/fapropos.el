@@ -115,47 +115,22 @@ fapropos will only find symbols which have already been interned
 		     (documentation y)
 		   (documentation-property y 'variable-documentation)) "") "\n"))))
 
-
-
-(defun symbols-like (s &optional as-strings)
+(defun symbols-like (s)
   "list variables with names matching regexp PAT"
-  (interactive "sString: ")
-  (let ((v (if (or as-strings (interactive-p))
-	       (loop for sym being the symbols
-		     with name = nil
-		     when (or (boundp sym) (fboundp sym))
-		     when (string-match s (setq name (symbol-name sym)))
-		     collect name)
-	     (loop for sym being the symbols
-		   when (or (boundp sym) (fboundp sym))
-		   when (string-match s (symbol-name sym))
-		   collect sym)
-	     )))
-    (if (interactive-p)
-	(let ((standard-output (get-buffer-create "*vars*")))
-	  (display-completion-list v)
-	  (pop-to-buffer standard-output)
-	  (goto-char (point-min))
-	  )
-      v)
-    )
+  (loop for sym being the symbols
+	when (or (boundp sym) (fboundp sym))
+	when (string-match s (symbol-name sym))
+	collect sym)
   )
+
 
 (defun functions-like (pat)
   "list functions with names matching regexp PAT"
   (interactive "sString: ")
-  (let ((v (sort (loop for x being the symbols 
-		       when (and (string-match pat (symbol-name x))
-				 (condition-case nil (symbol-function x) (error nil))) 
-		       collect x) 'string-lessp)))
-    (if (interactive-p)
-	(let ((standard-output (zap-buffer "*fns*")))
-	  (loop for x in v do (princ x) (princ "\n"))
-	  (pop-to-buffer standard-output)
-	  (goto-char (point-min))
-	  )
-      v)
-    )
+  (sort (loop for x being the symbols 
+	      when (and (string-match pat (symbol-name x))
+			(condition-case nil (symbol-function x) (error nil))) 
+	      collect x) 'string-lessp)
   )
 
 (defun functions-like* (&rest args)
