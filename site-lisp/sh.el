@@ -16,14 +16,14 @@
 
 (defvar *conditional-regexp* "^[[:blank:]]*\\(if\\)[[:blank:]]+" "regexp matching a conditional statement")
 (defvar *end-conditional-regexp*  "[[:blank:]]*\\(fi\\)[[:blank:]]*$" "regexp matching a conditional statement")
-(defvar *sh-ignore-conditional* nil)
+(defvar *sh-ignore-conditional* 0)
 
 ;; reduced to support just exports, because this is a REALLY BAD IDEA
 
 (defvar *sh-custom-parser* nil "assign to a function that can handle additional shell command lines")
 
-(defvar debug-parse-line t)
-(defvar debug-scan-file t)
+(defvar debug-parse-line nil)
+(defvar debug-scan-file nil)
 
 ; note: this might get redefined should you ever load doctor.el
 (defun $ (value) 
@@ -94,16 +94,16 @@ thing is `$' expanded
 "
 
   (cond
-   (*sh-ignore-conditional* nil)
    ((string-match *conditional-regexp* line)
     (unless (string-match *end-conditional-regexp* line) ; one liner
-      (setq *sh-ignore-conditional* t)))
+      (setq *sh-ignore-conditional* (1+ *sh-ignore-conditional*))
+      ))
    ((string-match *end-conditional-regexp* line)
-    (unless *sh-ignore-conditional* 
+    (unless (> *sh-ignore-conditional* 0)
       (message "sh warning: *end-conditional-regexp* found, with no matching *conditional-regexp* (%s)" line)
-    (when debug-parse-line (debug))
+      (when debug-parse-line (debug))
       )
-    (setq *sh-ignore-conditional* nil)
+    (setq *sh-ignore-conditional* (1- *sh-ignore-conditional*))
     )
    ((string-match *comment-regexp* line) nil)
    ((string-match *assignment-regexp* line)
@@ -149,12 +149,15 @@ thing is `$' expanded
 return list of command evaluation values with nil removed
 "
   (interactive "ffilename: ")
+  (setq *sh-ignore-conditional* 0)
   (remove* nil (mapcar 'sh-parse-line (split (read-file fn) "\C-j")))
-  (if *sh-ignore-conditional* 
-      (error "sh: *sh-ignore-conditional* still set after parse of file %s" fn)
+  (when (> *sh-ignore-conditional* 0)
+    (error "sh: *sh-ignore-conditional* still set after parse of file %s" fn)
     (when debug-scan-file (debug))
-    (setq *sh-ignore-conditional* nil))
+    )
+  (setq *sh-ignore-conditional* 0)
   )
+; (scan-file (expand-file-name "~/.bashrc"))
 ; (scan-file (expand-file-name "~/.private/.xdbrc"))
 
 (defun scan-file-p (fn)
