@@ -298,7 +298,7 @@ applies `switch-to-buffer' as displayfn
 
 (defun roll-buffer-list-3 (mode named in modified notmodified withpat)
   (interactive
-   (let* ((mode (intern (completing-read "mode: " (mapcar #'(lambda (x) (list (symbol-name x) x)) (symbols-like "-mode$")))))
+   (let* ((mode (intern (completing-read "mode: " (mapcar #'(lambda (x) (list (symbol-name x) x)) (collect-modes)))))
 	  (named (string* (read-string "named: ")))
 	  (in (string* (read-string "in: ")))
 	  (modified (not (not (string* (read-string "modified: ")))))

@@ -122,7 +122,11 @@ fapropos will only find symbols which have already been interned
 	when (string-match s (symbol-name sym))
 	collect sym)
   )
+; (symbols-like "goto")
 
+(defun collect-modes ()
+  (symbols-like "-mode$")
+  )
 
 (defun functions-like (pat)
   "list functions with names matching regexp PAT"
@@ -170,7 +174,7 @@ with optional PATTERN, return matching symbols
 (defun fapropos3 (s) (interactive "sString: ")
 "Show all symbols whose names match REGEXP."
   (let* ((ss (completing-read "Complete: " 
-			      (loop for x in (setq *fapropos3-cache* (symbols-like s t))
+			      (loop for x in (setq *fapropos3-cache* (symbols-like s))
 				    collect
 				    (list x)) nil t))
 	 (ssi (intern ss)))

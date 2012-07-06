@@ -40,26 +40,17 @@ with optional ARG, returns in reverse order
 
 ;; walk mru list of buffers
 
-(defun collect-buffers (mode) 
-  (let ((l (loop for x being the buffers
-		 if (eq mode (progn (set-buffer x) major-mode))
-		 collect x)))
-    (and l (append (cdr l) (list (car l))))
-    )
-  )
-
-
 (defun collect-buffers-mode (mode)
   (interactive "Smode: ")
   "returns a list of buffers with specified MODE
 when called interactively, displays a pretty list"
-  (let ((l 
-	 (loop
-	  for x being the buffers 
-	  if (eq (progn (set-buffer x) major-mode) mode) 
-	  collect x)))
-    )
+
+  (loop
+   for x being the buffers 
+   if (eq (progn (set-buffer x) major-mode) mode) 
+   collect x)
   )
+; (collect-buffers-mode  'emacs-lisp-mode)
 
 (defun collect-buffers-named (pat)
   "list buffers with names matching PAT"
@@ -121,7 +112,7 @@ when called interactively, displays a pretty list"
 
 (defun kill-buffers-mode (mode)
   "kill all buffers in mode"
-  (interactive (list (intern (completing-read "mode: "  (mapcar 'list (symbols-like "-mode$" t))))))
+  (interactive (list (intern (completing-read "mode: "  (mapcar 'list (collect-modes))))))
   (loop for x in (collect-buffers-mode mode)
 	do
 	(kill-buffer x))
