@@ -11,7 +11,7 @@ if specified, PATH is a list of directories.  default is split $PATH
   (loop 
    with y = nil
    with l = exec-path
-   with pat = (concat thing whence-executable-terminator)
+   with pat = (concat "^" thing whence-executable-terminator)
    for x in l when (setq y (directory-files x t pat)) return (car y)
    )
   )

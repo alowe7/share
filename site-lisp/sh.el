@@ -59,6 +59,7 @@ thing is `$' expanded
 
 (defun scan-file (fn &optional list-only)
   "interpret shell script FILE; propagate changes back into process environment.
+returns FILE
 with optional second arg LIST-ONLY, return a list of changed environment variables, but don't set them
 "
   (let* ((environment-vars (loop for x in (split (eval-shell-command (format "bash -c '(. %s; env)'" fn)) "\C-j") collect (split x "=")))
@@ -75,6 +76,7 @@ with optional second arg LIST-ONLY, return a list of changed environment variabl
 	    do
 	    (setenv (car x) (cadr x))
 	    )
+      fn
       )
     )
   )
