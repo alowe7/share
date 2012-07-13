@@ -63,6 +63,32 @@ add to front of list unless optional APPEND is set.  see `add-to-load-path'
     )
   )
 
+(defun find-dir-in-path (dir path &optional predicate)
+  "returns DIR expanded along members of directory list PATH, if it exists and is a directory, else nil.
+dir must also satisfy optional PREDICATE of one arg, if specified
+"
+  (loop
+   with d
+   for p in path
+   when (and (file-directory-p (setq d (expand-file-name dir p))) (or (not predicate) (funcall predicate d)))
+   return d)
+  )
+
+(defun find-file-in-path (file &optional path predicate)
+  "finds FILE expanded along members of directory list PATH, if it exists visit it, else nil.
+default path is  `load-path'
+file must also satisfy optional PREDICATE of one arg, if specified
+"
+  (let ((f (loop
+	    with v
+	    for p in (or path load-path)
+	    when (and (file-exists-p (setq v (expand-file-name file p))) (or (not predicate) (funcall predicate v)))
+	    return v)))
+    (when (and f (file-exists-p f) (find-file f)))
+    )
+  )
+; (find-file-in-path "pre-w3m.el")
+
 (defun loadp (prefix file)
   (let* ((f0 (file-name-sans-extension (file-name-nondirectory (format "%s" file))))
 	 (f1 (format "%s%s" prefix f0))
