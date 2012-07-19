@@ -16,14 +16,14 @@
     'member)
   "function to apply to determine filename equivalence")
 
-(defvar share (expand-file-name (or (getenv "SHARE") "/usr/share/emacs")))
-(defvar emacsdir (expand-file-name
-		(or (getenv "EMACS_DIR")
-		    (getenv "EMACSDIR")
-		    (and (getenv "EMACSPATH")
-			 (concat (getenv "EMACSPATH") "/.."))
-			share
-		    )))
+(defvar *share* (expand-file-name (or (getenv "SHARE") "/usr/share/emacs")))
+(defvar *emacsdir* (expand-file-name
+		    (or (getenv "EMACS_DIR")
+			(getenv "EMACSDIR")
+			(and (getenv "EMACSPATH")
+			     (concat (getenv "EMACSPATH") "/.."))
+			*share*
+			)))
 
 
 ;; this advice allows pre- and post- hooks on all loaded features
@@ -297,7 +297,7 @@ returns nil otherwise.
 	(add-to-list 'load-path (expand-file-name x) append)
 
 	(if subdirs
-	    (mapc '(lambda (y) 
+	    (mapc #'(lambda (y) 
 		       (if (and (file-directory-p (concat x "/" y)) (not (string= y ".")) (not (string= y "..")))
 			   (add-to-load-path (concat x "/" y) append subdirs)))
 		    (directory-files x)))
@@ -418,12 +418,18 @@ if there is a choice between compiled and source versions of the parent, prefer 
 	 (parent (and l
 		      (let ((z (expand-file-name (concat y ".el") (file-name-directory (car l))))) (and (file-exists-p z) z))))
 	 )
-    (if (and (interactive-p) parent) (find-file parent) parent)
+        parent
     )
   )
 ; (find-config-parent "c:/home/a/emacs/config/hosts/granite/keys.el")
 ; (find-config-parent "c:/home/a/emacs/config/hosts/granite/post-xz.el")
 ; (find-config-parent "c:/home/a/emacs/config/os/w32/keys.el")
+
+(defun visit-config-parent (&optional module)
+  (let ((parent (find-file module) ))
+    (and parent (file-exists-p parent) (find-file parent))
+    )
+  )
 
 (defvar hooked-preloaded-modules nil
   "list of preloaded modules.  if there's any load-hooks for these, they need to be run at init time
@@ -438,10 +444,10 @@ members may be symbols or strings, see `post-load'
 (condition-case err
     (mapc 'add-to-load-path
      (nconc 
-      (and emacsdir (directory-files (concat emacsdir "/site-lisp") t "^[a-zA-Z]"))
-      (and share
-	   (nconc (directory-files (concat share "/site-lisp") t "^[a-zA-Z]")
-		  (list (concat share "/site-lisp"))))
+      (and *emacsdir* (directory-files (concat *emacsdir* "/site-lisp") t "^[a-zA-Z]"))
+      (and *share*
+	   (nconc (directory-files (concat *share* "/site-lisp") t "^[a-zA-Z]")
+		  (list (concat *share* "/site-lisp"))))
       )
      )
   (file-error t)
@@ -451,12 +457,12 @@ members may be symbols or strings, see `post-load'
 (require 'find-func)
 (defvar *site-start-load-history* nil)
 (setq  *site-start-load-history*
-       (and share
-	    (let ((site-start.d (concat share "/site-lisp/site-start.d")))
+       (and *share*
+	    (let ((site-start.d (concat *share* "/site-lisp/site-start.d")))
 	      (mapc
-	       '(lambda (f) (load f t t))
+	       #'(lambda (f) (load f t t))
 	       (and (file-directory-p site-start.d)
-		    (remove* '("." "..") (directory-files site-start.d) :test '(lambda (x y) (member y x)))
+		    (remove* '("." "..") (directory-files site-start.d) :test #'(lambda (x y) (member y x)))
 		    )
 	       )
 	      )
