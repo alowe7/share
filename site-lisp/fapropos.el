@@ -171,7 +171,7 @@ with optional PATTERN, return matching symbols
 
 (defvar *fapropos3-cache* nil)
 
-(defun fapropos3 (s) (interactive "sString: ")
+(defun fapropos3 (s) (interactive "sShow symbols matching regexp: ")
 "Show all symbols whose names match REGEXP."
   (let* ((ss (completing-read "Complete: " 
 			      (loop for x in (setq *fapropos3-cache* (symbols-like s))

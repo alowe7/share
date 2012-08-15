@@ -63,7 +63,7 @@ returns only required args
   " eval BODY.  
 kludgy special case if  body is a symbol with a function definition of no (required) args, eval the function def"
   (cond 
-   ((and (symbolp body) (fboundp body) (= (length (arglist body)) 0))
+   ((and (functionp body) (= (length (arglist body)) 0))
   ; its a function of no args.  call it.
     (funcall body)
     )

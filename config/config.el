@@ -1,5 +1,5 @@
 (put 'config 'rcsid 
- "$Id: config.el 80 2011-06-06 04:18:56Z alowe $")
+ "$Id$")
 
 (eval-when-compile (setq byte-compile-warnings '(not cl-functions)))
 

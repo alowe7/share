@@ -1,4 +1,4 @@
-# $Id: Makefile 77 2011-04-29 23:19:54Z alowe $
+# $Id$
 
 VERSION = 1.0
 

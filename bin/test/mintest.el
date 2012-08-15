@@ -1,5 +1,5 @@
 (put 'post-advise 'rcsid
- "$Id: post-advise.el 1007 2011-04-18 21:43:14Z alowe $")
+ "$Id$")
 
 (require 'ctl-ret)
 
