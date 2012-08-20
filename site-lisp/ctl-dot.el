@@ -1,3 +1,5 @@
+(require 'ctl-meta)
+
 ; yet another prefix map
 (if (not (fboundp 'ctl-.-prefix)) 
     (define-prefix-command 'ctl-.-prefix)) ;; don't wipe out map if it already exists

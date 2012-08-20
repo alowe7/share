@@ -139,4 +139,7 @@ the result of `read-string' is passed to `string*'
 ; (let ((table '(("a" "1") ("b" "2")("c" "3")))) (completing-read* "thing (%s): "  table "b" '(nil t)))
 ; (completing-read* "foo (%s): " (lambda () '("a" "b" "c")) "c" '(nil t))
 
+(defmacro  describe-expression (expr) "EXPR is any lisp expression.  evaluate it and describe the result" (let ((expression (eval expr))) (describe-variable (quote expression))))
+; (describe-expression (grab-load-history))
+
 (provide 'typesafe)
