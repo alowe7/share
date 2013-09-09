@@ -7,7 +7,7 @@
   )
 ; (assert (= 2 (cardinality 'setcdr)))
 ; (assert (= 0 (cardinality 'html-mode)))
-; (assert (= 1 (cardinality '(lambda (foo))))
+; (assert (= 1 (cardinality (lambda (foo))))
 
 (defun arglist (body)
   "wow. all this just to get the arglist...

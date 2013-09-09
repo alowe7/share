@@ -73,6 +73,8 @@ removes empty strings unless optional third parameter KEEP-EMPTY-STRINGS is set
        )
   )
 
+; (assert (equal '("foo" "bar" "baz" "bo" "go") (split "foo\nbar\n\nbaz\nbo\ngo"  "\n")))
+; (assert (equal '("foo" "bar" "" "baz" "bo" "go") (split "foo\nbar\n\nbaz\nbo\ngo"  "\n" t)))
 ; (assert (equal (split "abcd efgh, ijkl	mnop  " ) '("abcd" "efgh," "ijkl" "mnop")))
 ;  (assert (equal (split "foo;bar;baz" ?;) '("foo" "bar" "baz")))
 ;  (assert (equal  (split "-outline-Arial-bold-r-normal-normal-13-97-96-96-p-60-iso10646-1" "-" t) '("" "outline" "Arial" "bold" "r" "normal" "normal" "13" "97" "96" "96" "p" "60" "iso10646" "1")))

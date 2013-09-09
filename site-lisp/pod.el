@@ -83,7 +83,7 @@ with optional FILE, operate on that"
 	(pod2text f (concat (file-name-sans-extension f) " *pod*"))))
 
 (add-hook 'dired-load-hook
-	  '(lambda () 
+	  (lambda () 
 	     (define-key  dired-mode-map (vector 'f9) 'dired-pod)
 	     )
 	  )

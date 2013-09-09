@@ -19,7 +19,7 @@ replace an existing mapping only if optional CLOBBER is set
      (cond ((not (assoc (car m) l))
 	    (push m l))
 	   (,clobber
-	    (setq l (remove* m l :test '(lambda (x y) (equal (car x) (car y)))))
+	    (setq l (remove* m l :test (lambda (x y) (equal (car x) (car y)))))
 	    (push m l))
 	   )
 

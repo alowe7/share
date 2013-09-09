@@ -244,10 +244,10 @@ returns data on cell, if any.
 
 ;; advice for using:
 ;; (add-hook 'qsave-minor-mode-after-search-hook 
-;;   '(lambda () (qsave-search buffer))
+;;   (lambda () (qsave-search buffer))
 ;;   " save output of each qsave-minor-mode search on a stack for retrieval")
 ;; 
-;; (add-hook 'qsave-minor-mode-init-hook '(lambda () 
+;; (add-hook 'qsave-minor-mode-init-hook (lambda () 
 ;; (define-key qsave-minor-mode-mode-map "p" 'previous-qsave-minor-mode-search)
 ;; (define-key qsave-minor-mode-mode-map "n" 'next-qsave-minor-mode-search)
 ;; ))

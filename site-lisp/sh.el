@@ -88,8 +88,10 @@ with optional second arg LIST-ONLY, return a list of changed environment variabl
 return nil if file does not exist or cannot be read.  else returns the filename
 "
 
-  (interactive (list 
-		(read-file-name* (format "file to scan (%s): " (thing-at-point 'filename)) (thing-at-point 'filename))))
+  (interactive 
+  ; (list (read-file-name* (format "file to scan (%s): " (thing-at-point 'filename)) (thing-at-point 'filename)))
+   "ffile to scan: "
+   )
 		   
   (if (-r fn) (scan-file fn))
 

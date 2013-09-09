@@ -212,7 +212,7 @@ EXPR may be a function of zero or one argument, the indicated-word"
 
 ; for example, to double a list of numbers:
 ;(while (not (eobp))
-;  (replace-indicated-word '(lambda (x) 
+;  (replace-indicated-word (lambda (x) 
 ;			     (format "%d" (* (read x) 2))))
 ;  (forward-line 1)
 ;  (beginning-of-line)

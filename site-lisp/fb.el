@@ -314,7 +314,7 @@ also see `fb-mode-map'
 
 
 (define-key fb-mode-map "g" 
-  '(lambda () (interactive)
+  (lambda () (interactive)
      (let ((default-directory default-directory))
        (save-restriction
 	 (widen)
@@ -324,7 +324,7 @@ also see `fb-mode-map'
        )))
  
 (define-key fb-mode-map "q" 
-  '(lambda () (interactive)
+  (lambda () (interactive)
      (kill-buffer (current-buffer))))
 
 (define-key fb-mode-map "\C-m" 'fb-exec-file)
@@ -359,7 +359,7 @@ also see `fb-mode-map'
 (define-key fb-mode-map "|" 'fb-grep-files)
 (define-key fb-mode-map "<" 'fb-pipe-command)
 (define-key fb-mode-map "!" 'fb-do-shell-command)
-(define-key fb-mode-map "m" '(lambda () (interactive) 
+(define-key fb-mode-map "m" (lambda () (interactive) 
 			       (fb-shell-command "nroff -man")))
 
 (define-key fb-mode-map "\C-d" (lambda () (interactive) 
@@ -448,7 +448,7 @@ all other patterns (e.g. \"foo*\") remain unchanged.
 (defvar ff-hack-pat 'identity)
 ; (setq ff-hack-pat 'ff-hack-pat)
 ; this hack might be suitable for systems with letter drive names
-; (setq ff-hack-pat '(lambda (pat) (let ((pat (if (eq (aref pat 0) ?^) (substring pat 1) pat))) (concat "^(.:)*" pat))))
+; (setq ff-hack-pat (lambda (pat) (let ((pat (if (eq (aref pat 0) ?^) (substring pat 1) pat))) (concat "^(.:)*" pat))))
 
 
 ; hack to avoid auto-going to a binary file
@@ -530,8 +530,8 @@ returns a filename containing results"
   )
 
 ; e.g. find executable only:
-;  (ff "lff" '(lambda (x) (and (string-match "x" (elt (file-attributes x) 8)) x)))
-;  (ff "bin" '(lambda (x) (and (string-match "drwx" (elt (file-attributes x) 8)) x)))
+;  (ff "lff" (lambda (x) (and (string-match "x" (elt (file-attributes x) 8)) x)))
+;  (ff "bin" (lambda (x) (and (string-match "drwx" (elt (file-attributes x) 8)) x)))
 
 (defun fb-grep-files (arg)
   "search for REGEXP in files in region
@@ -558,7 +558,7 @@ with prefix argument, prompt for additional args for grep
 ; if grep-command is a form of grep add -s option to ignore missing files (if not already specified)
     (if (and (string-match "grep" grep-command)
 	     (not (string-match "-s" grep-command)))
-	(setq grep-command (replace-in-string "grep " "grep -s " grep-command)))
+	(setq grep-command (replace-regexp-in-string "grep " "grep -s " grep-command)))
 
     (shell-command-on-region
      p1

@@ -237,6 +237,6 @@ otherwise, FROM should be a character position.
   (trim-blank-lines-region (point) (point-max))
   )
 
-(fset 'trim 'trim-white-space-string)
+; (fset 'trim 'trim-white-space-string)
 
 (provide 'trim)

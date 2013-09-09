@@ -30,7 +30,7 @@
 (defun roll-search (a pat displayfn i)
   (position pat a 
 	    :test 
-	    #'(lambda (a b) (string-match a (if displayfn (funcall displayfn b) b)))
+	    (lambda (a b) (string-match a (if displayfn (funcall displayfn b) b)))
 	    :start
 	    (or i 0)
 	    ))
@@ -180,7 +180,7 @@ with prefix arg, prompts for major mode (completing from `atoms-like' \"-mode\")
   (let* ((m 
 	  (cond ((and (symbolp arg) (not (null arg))) arg)
 		(arg (completing-read (format "mode (%s): " major-mode)
-				      (mapcar #'(lambda (x) 
+				      (mapcar (lambda (x) 
 						 (cons
 						  (format "%s" x) x))
 					      (atoms-like "-mode"))))
@@ -205,19 +205,19 @@ applies `switch-to-buffer' as displayfn
 "
   (interactive "P")
   (let ((m (if arg
-	       (intern (completing-read "mode: " (mapcar #'(lambda (x) 
+	       (intern (completing-read "mode: " (mapcar (lambda (x) 
 							    (cons
 							     (format "%s" x) x))
 							 (atoms-like "-mode"))))
 	     major-mode)))
     
-    (roll-list (collect-buffers-mode (if (atom m) m (or (string* m) major-mode))) #'(lambda (x) (progn (switch-to-buffer x) (buffer-name x))) 'kill-buffer-1 'switch-to-buffer)
+    (roll-list (collect-buffers-mode (if (atom m) m (or (string* m) major-mode))) (lambda (x) (progn (switch-to-buffer x) (buffer-name x))) 'kill-buffer-1 'switch-to-buffer)
     )
   )
 
 (defun read-mode (prompt)
   "read something that might be a mode with completion"
-  (let ((s (completing-read prompt (mapcar #'(lambda (x) 
+  (let ((s (completing-read prompt (mapcar (lambda (x) 
 					      (cons
 					       (format "%s" x) x))
 					   (atoms-like "-mode$")))))
@@ -233,7 +233,7 @@ applies `switch-to-buffer' as displayfn
 		(read-string "pat: ")
 		(read-mode  "mode: ")))
   (roll-list (collect-buffers-with-mode pat (or mode major-mode))
-	     #'(lambda (x) (progn (switch-to-buffer x) (buffer-name x)))
+	     (lambda (x) (progn (switch-to-buffer x) (buffer-name x)))
 	     'kill-buffer-1
 	     'switch-to-buffer)
   )
@@ -241,7 +241,7 @@ applies `switch-to-buffer' as displayfn
 (defun roll-buffer-like (arg) 
   " roll buffers with mode like current buffer"
   (interactive "P") 
-  (let ((displayfn (if arg #'(lambda (b) (switch-to-buffer b) (message (buffer-name b))) 'buffer-name)))
+  (let ((displayfn (if arg (lambda (b) (switch-to-buffer b) (message (buffer-name b))) 'buffer-name)))
     (roll-list (roll (collect-buffers-mode major-mode)) displayfn 'kill-buffer-1 'switch-to-buffer
 	       '((?l (lambda (v i) (message "%d/%d" i (length x)) (sit-for 2))))
 	       )
@@ -279,7 +279,7 @@ applies `switch-to-buffer' as displayfn
 		      (or *last-roll-with* (indicated-word)))))
   (let ((l (collect-buffers-with pat)))
     (if l 
-	(roll-list (or l (real-buffer-list nil)) 'buffer-name 'kill-buffer-1 #'(lambda (b) (switch-to-buffer b)(goto-char (point-min)) (search-forward pat nil t)))
+	(roll-list (or l (real-buffer-list nil)) 'buffer-name 'kill-buffer-1 (lambda (b) (switch-to-buffer b)(goto-char (point-min)) (search-forward pat nil t)))
       (error (format "no buffers contain %s" pat))
       )
     )
@@ -298,7 +298,7 @@ applies `switch-to-buffer' as displayfn
 
 (defun roll-buffer-list-3 (mode named in modified notmodified withpat)
   (interactive
-   (let* ((mode (intern (completing-read "mode: " (mapcar #'(lambda (x) (list (symbol-name x) x)) (collect-modes)))))
+   (let* ((mode (intern (completing-read "mode: " (mapcar (lambda (x) (list (symbol-name x) x)) (collect-modes)))))
 	  (named (string* (read-string "named: ")))
 	  (in (string* (read-string "in: ")))
 	  (modified (not (not (string* (read-string "modified: ")))))
@@ -306,9 +306,9 @@ applies `switch-to-buffer' as displayfn
 			    (not (not (string* (read-string "notmodified: "))))))
 	  (withpat (string* (read-string "withpat: "))))
      (list mode named in modified notmodified withpat)))
-  (let ((fn #'(lambda (x)
+  (let ((fn (lambda (x)
 	       (setq fn 
-		     #'(lambda (x)
+		     (lambda (x)
 			(switch-to-buffer x)
 			(if withpat (search-forward withpat))
 			(buffer-name x)))
@@ -323,7 +323,7 @@ applies `switch-to-buffer' as displayfn
       :modified modified  
       :notmodified notmodified
       :withpat withpat)
-     #'(lambda (x) (funcall fn x)) 'kill-buffer-1 #'(lambda (x) (message (buffer-name x)))
+     (lambda (x) (funcall fn x)) 'kill-buffer-1 (lambda (x) (message (buffer-name x)))
      )
     )
   )

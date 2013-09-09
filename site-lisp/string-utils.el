@@ -20,6 +20,7 @@
   "replace chars in TARGET according to alist MAP
 where map is an alist of the form: ((char1 string1) (char2 string2))
 
+unquoted occurences of char x are replaced with arbitrary string x
 target may be a string or a buffer; 
 
 returns result;

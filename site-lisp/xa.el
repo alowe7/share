@@ -31,7 +31,7 @@ return nil when cancelled, else return `buffer-string'
 		(if initial-input (progn (insert initial-input) (goto-char (point-min))))
   ; todo make this a custom sub mode
 		(local-set-key "\C-c\C-c" 'xa-done)
-		(local-set-key "\C-c\C-u" '(lambda () (interactive) (let ((ret (prog1 (y-or-n-p "are you sure? ") (message "")))) (and ret (throw 'done  t)))))
+		(local-set-key "\C-c\C-u" (lambda () (interactive) (let ((ret (prog1 (y-or-n-p "are you sure? ") (message "")))) (and ret (throw 'done  t)))))
 		(setq fill-column (max (- (frame-width) 15) 70))
 		(message "C-c C-c to exit	 C-c C-u to cancel")
 		(sit-for 1)

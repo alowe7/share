@@ -117,7 +117,7 @@ the default mode used is `major-mode'
   (let ((l (collect-scratch-buffers))
 	(x (/ (window-width) 2)))
     (roll-list l 
-	       '(lambda (b)
+	       (lambda (b)
 		  (format "%s\t\t%s..." (buffer-name b) (with-current-buffer  b (tr (buffer-substring (point-min) (min (1- (point-max)) x)) '((?
 																		      "\\n"))))))
 	       'kill-buffer-1 

@@ -116,8 +116,8 @@ cleans up linefeeds in resulting output"
 	(nl (if (and (stringp new-letter) (> (length new-letter) 0))
 		     (aref new-letter 0) new-letter))
 	(fn (if nil
-		'(lambda (x) (char-to-string (if (char-equal x ol) nl x)))
-	      '(lambda (x) (if (char-equal x ol) nl (char-to-string x)))
+		(lambda (x) (char-to-string (if (char-equal x ol) nl x)))
+	      (lambda (x) (if (char-equal x ol) nl (char-to-string x)))
 	      )))
     (mapconcat fn s ""))
   )
@@ -142,7 +142,7 @@ cleans up linefeeds in resulting output"
 
 (defun clean-string (s &optional c)
   "replace occurrences of ^J in STRING with CHAR (default nil)"
-  (trim (replace-letter s "
+  (trim-white-space-string (replace-letter s "
 " c))
   )
 

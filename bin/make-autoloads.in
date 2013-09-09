@@ -155,4 +155,4 @@ $aload_clause="(autoload (car x) (cadr x) nil t)";
 # guard clause to avoid overwriting something thats already declared autoload from elsewhere unless forcing
 $aload_clause="(let ((fn (condition-case x (symbol-function  (car x)) (error nil)))) (and (null fn) $aload_clause))" unless $opt_force;
 
-print "(mapcar '(lambda (x) $aload_clause) $alist_symbol)\n";
+print "(mapcar (lambda (x) $aload_clause) $alist_symbol)\n";

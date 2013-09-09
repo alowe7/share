@@ -63,3 +63,9 @@
     (widen)    
     )
   )
+
+
+;; unit tests
+(assert (null (/* foo */)))
+(assert (null (/* (foo) */)))
+

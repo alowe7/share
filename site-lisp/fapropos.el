@@ -167,7 +167,7 @@ with optional PATTERN, return matching symbols
 
 ; (defun apropos-completion-setup-function ()
 ;  (local-set-key (vector (quote down-mouse-1))
-; 								'(lambda (e) (interactive) (debug))))
+; 								(lambda (e) (interactive) (debug))))
 
 (defvar *fapropos3-cache* nil)
 
