@@ -11,15 +11,9 @@ PKGLISP = $(SITELISP)/$(PKG)-$(VERSION)
 SITESTART = $(SITELISP)/site-start.d
 AUTOLOADS=$(PKG)-autoloads
 
-ifneq ($(strip $(EMACSPATH)),)
-EMACS := $(EMACSPATH)/emacs
-else
 EMACS := $(shell which emacs  2> /dev/null)
-endif
-
 
 PWD=$(shell pwd)
-MAKE_AUTOLOADS=../bin/make-autoloads
 
 XZFLAGS = -t1
 
@@ -29,7 +23,6 @@ XZFLAGS = -t1
 SOURCES:=$(shell find  . -name "*.el" -a ! -name "byte-compile-directory.el")
 
 TARGETS := $(SOURCES:.el=.elc)
-
 
 all:
 
@@ -46,7 +39,7 @@ pkglisp: FORCE
 	install -m 444 $(AUTOLOADS) $(SITESTART)
 
 autoloads: FORCE
-	$(MAKE_AUTOLOADS) --top=$(PKGLISP) --prefix=$(PKG) -c $(SOURCES) --sourcepath $(PWD) > $(AUTOLOADS)
+	$(EMACS) -batch --load="make-autoloads.el" --eval "(make-autoloads \"$(PWD)\" \"$(PKGLISP)\" \"$(PKG)\" t t)"
 
 .xz.dat: FORCE
 	xz $(XZFLAGS) $(SOURCES)
