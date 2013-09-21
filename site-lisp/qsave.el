@@ -242,7 +242,23 @@ returns data on cell, if any.
 
 (add-to-list 'minor-mode-alist '(qsave-mode "qsave"))
 
-;; advice for using:
+;; usage:
+;;
+;; (require 'qsave)
+;; 
+;;  after inserting new content:
+;;   (qsave-search buffer label &optional data)
+;; 
+;; ; usually buffer is (current-buffer)
+;; ; label will get updated in the minibuffer
+;; 
+;; define keys to roll the qsave list associated with the buffer
+;; (define-key map "p" 'roll-qsave)
+;; (define-key map "n" 'roll-qsave-1)
+;; 
+;;
+;;  alternatively put this into a hook:
+;; 
 ;; (add-hook 'qsave-minor-mode-after-search-hook 
 ;;   (lambda () (qsave-search buffer))
 ;;   " save output of each qsave-minor-mode search on a stack for retrieval")
