@@ -2,6 +2,7 @@
 
 INSTALL = install
 LOCALBIN = /usr/local/bin
+SHELL = /usr/bin/sh
 
 .PHONY: FORCE
 
