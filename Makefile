@@ -8,12 +8,10 @@ SHELL=/bin/sh
 all:
 
 ship:
-	$(MAKE) --directory bin ship
 	$(MAKE) --directory config ship
 	$(MAKE) --directory site-lisp ship
 
 clean:
-	$(MAKE) --directory bin clean
 	$(MAKE) --directory config clean
 	$(MAKE) --directory site-lisp clean
 
