@@ -59,28 +59,21 @@ thing is `$' expanded
 
 (defun scan-file (fn &optional list-only)
   "interpret shell script FILE; propagate changes back into process environment.
-returns FILE
-with optional second arg LIST-ONLY, return a list of changed environment variables, but don't set them
+return a list of changed environment variables of the form ((name val) ...)
+
+with optional second arg LIST-ONLY, returns the vars that changed, but do not set them in the process environment
 "
-  (let* ((environment-vars (loop for x in (split (eval-shell-command (format "bash -c '(. %s; env)'" fn)) "\C-j") collect (split x "=")))
-	 (changed-environment-vars (loop for x in environment-vars
-					 when 
-					 (let ((v (getenv (car x)))) 
-					   (or (not v)
-					       (not (string= (cadr x) v))))
-					 collect x)))
-    
-    (if list-only 
-	changed-environment-vars
-      (loop for x in changed-environment-vars
-	    do
-	    (setenv (car x) (cadr x))
-	    )
-      fn
-      )
+  (let* (
+	 (before (sort (split (eval-shell-command "bash -c 'env'")) 'string-lessp))
+	 (after (sort (split (eval-shell-command (format "bash -c '(. %s; env)'" fn))) 'string-lessp))
+	 (diff (mapcar '(lambda (x) (split x "=")) (cl-set-difference after before :test 'string=)))
+	 )
+    (unless list-only 
+      (mapc '(lambda (x) (apply 'setenv x)) diff))
+    diff
     )
   )
-; (let ((l (scan-file (expand-file-name "~/.bashrc")))) (describe-variable 'l))
+; (let ((l (scan-file (expand-file-name "~/.bashrc" t)))) (describe-variable 'l))
 ; (scan-file (expand-file-name "~/.private/.xdbrc"))
 
 (defun scan-file-p (fn)
