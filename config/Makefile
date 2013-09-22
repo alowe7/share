@@ -9,25 +9,21 @@ SITELISP = $(SHARE)/site-lisp
 SITESTART = $(SITELISP)/site-start.d
 PWD=$(shell pwd)
 
-ifneq ($(strip $(EMACSPATH)),)
-EMACS := $(EMACSPATH)/emacs
-else
 EMACS := $(shell which emacs  2> /dev/null)
-endif
 
 .PHONY: FORCE
 
 # everything in this directory is shippable
-CONFIG=config.el
+CONFIGS=config.el make-autoloads.el
 CONFIGINIT=config-init.el
 
-CONFIGTARGET := $(CONFIG:.el=.elc)
+CONFIGTARGETS := $(CONFIGS:.el=.elc)
 
 all:
 
 ship: compile init
 	mkdir -p $(SITELISP)
-	install -m 444 $(CONFIGTARGET) $(SITELISP)
+	install -m 444 $(CONFIGTARGETS) $(SITELISP)
 	mkdir -p $(SITESTART)
 	install -m 444 $(CONFIGINIT) $(SITESTART)
 
@@ -41,5 +37,5 @@ compile: FORCE
 ifeq ($(strip $(EMACS)),)
 	@echo "EMACS not found"
 else
-	$(EMACS) --batch -e batch-byte-compile $(CONFIG)
+	$(EMACS) --batch -e batch-byte-compile $(CONFIGS)
 endif

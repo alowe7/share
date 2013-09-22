@@ -1,4 +1,7 @@
-(require 'cl)
+(put 'make-autoloads 'rcsid
+ "$Id$")
+
+ (eval-when-compile (require 'cl))
 
 ; this is a rewrite of make-autoloads from perl
 
@@ -155,4 +158,4 @@
 ; (make-autoloads "/src/xz/site-lisp" "/usr/share/emacs/site-lisp/xz-4.0/" "xz" t t)
 
 ;; example 
-;; emacs -q --load="make-autoloads.el" --eval "(make-config-autoloads \"/src/emacs\" nil \"config\" t)"
+;; emacs --batch --load="make-autoloads.el" --eval "(make-config-autoloads \"/src/emacs\" nil \"config\" t)"

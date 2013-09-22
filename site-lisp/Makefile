@@ -39,7 +39,11 @@ pkglisp: FORCE
 	install -m 444 $(AUTOLOADS) $(SITESTART)
 
 autoloads: FORCE
-	$(EMACS) -batch --load="make-autoloads.el" --eval "(make-autoloads \"$(PWD)\" \"$(PKGLISP)\" \"$(PKG)\" t t)"
+ifeq ($(strip $(EMACS)),)
+	@echo "EMACS not found"
+else
+	$(EMACS) -batch --directory "/usr/share/emacs/site-lisp" --load="make-autoloads" --eval "(make-autoloads  \"$(PWD)\" \"$(PKGLISP)\" \"$(PKG)\" t t)"
+endif
 
 .xz.dat: FORCE
 	xz $(XZFLAGS) $(SOURCES)
