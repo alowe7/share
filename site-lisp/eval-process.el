@@ -12,7 +12,7 @@
 (defun default-directory* ()
   "evaluates to `default-directory' but gracefully handle case where it is unavailable for some reason
 "
-  (if (file-directory-p default-directory) default-directory (expand-file-name "/"))
+  (if (file-directory-p default-directory) default-directory (unhandled-file-name-directory directory))
   )
 
 (defvar last-exit-status nil)
@@ -38,12 +38,11 @@ this function evaluates to the process output  "
 	(let ((cmd1 (if (listp cmd) cmd (split cmd))))
 	  (setq args (nconc (cdr cmd1) args))
 	  (car cmd1)))
-       (dir (default-directory*))
-       (buffer (get-buffer-create " *eval*"))
+       (buffer-name " *eval*")
+       (buffer (progn (kill-buffer buffer-name) (get-buffer-create buffer-name)))
        v)
     (with-current-buffer buffer
       (erase-buffer)
-      (setq default-directory dir)
       (setq last-exit-status nil)
       (setq last-exit-status
 	    (condition-case x
@@ -65,7 +64,11 @@ this function evaluates to the process output  "
       )
     )
   )
-
+; it is important that expected default directory ends in a '/'
+; see unhandled-file-name-directory
+; (let ((default-directory (expand-file-name "/home/")))  (call-process "pwd" nil t))
+; (let ((default-directory (expand-file-name "/home/")))  (eval-process "pwd"))
+; (let ((default-directory (expand-file-name "/home/"))) (default-directory*))
 
 (defun insert-eval-process (cmd &optional args)
   " insert results of executing COMMAND into current buffer
