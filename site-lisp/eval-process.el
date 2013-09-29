@@ -17,7 +17,7 @@
 
 (defvar last-exit-status nil)
 
-(defvar *eval-process-stderr-file* nil "path to contain stderr from eval-process")
+(defvar *eval-process-stderr-file* t "path to contain stderr from eval-process")
 ; alternative is to (defun* eval-process .. &key *stderr* ...)
 
 (defun eval-process (cmd &rest args)
