@@ -9,11 +9,15 @@
 
 ;; processes that return values
 
-(defun default-directory* ()
+(defun default-directory* (&optional dir)
   "evaluates to `default-directory' but gracefully handle case where it is unavailable for some reason
 "
-  (if (file-directory-p default-directory) default-directory (unhandled-file-name-directory directory))
+  (let ((dir (or dir default-directory)))
+    (while (not (file-directory-p dir)) (setq dir (file-name-directory (directory-file-name dir))))
+    dir)
   )
+; (assert (string= "/" (default-directory* "/notthere3/notthere1/notthere2")))
+; (assert (string= "/home/" (default-directory* "/home/notthere1/notthere2")))
 
 (defvar last-exit-status nil)
 
@@ -39,7 +43,7 @@ this function evaluates to the process output  "
 	  (setq args (nconc (cdr cmd1) args))
 	  (car cmd1)))
        (buffer-name " *eval*")
-       (buffer (progn (kill-buffer buffer-name) (get-buffer-create buffer-name)))
+       (buffer (progn (and (buffer-live-p buffer-name) (kill-buffer buffer-name)) (get-buffer-create buffer-name)))
        v)
     (with-current-buffer buffer
       (erase-buffer)
