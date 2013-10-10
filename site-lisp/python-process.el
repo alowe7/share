@@ -3,8 +3,13 @@
 
 (require 'eval-process)
 
-(defvar *python-command* "/Python27/python")
+(defvar *python-command* (executable-find "python") "where to find python executable") 
+(unless (file-executable-p *python-command*) (error "python executable not found: %s" *python-command*))
+
+(defvar *python-log-command* nil)
+
 (defun eval-python-process (script &rest args)
+  (when *python-log-command* (message "%s %s %s" *python-command* script (mapconcat 'identity args " ")))
   (apply 'eval-process `(,*python-command* ,script ,@args))
   )
 ; (eval-python-process script args)
@@ -14,13 +19,18 @@
 returns output from command, if any
 "
 
+  (when *python-log-command* (message "%s %s" command (mapconcat 'identity args " ")))
+
   (let* (
-	 (b (zap-buffer (concat command "-pipe-buffer")))
-	 (p (apply 'start-process (nconc (list
-					  (concat command "-pipe-process")
-					  b
-					  command)
-					 args)))
+	 (bname (concat command "-pipe-buffer"))
+	 (b 
+	  (progn (and (get-buffer bname) (kill-buffer bname)) (get-buffer-create bname)))
+	 (c (nconc (list
+		    (concat command "-pipe-process")
+		    b
+		    command)
+		   args))
+	 (p (apply 'start-process c))
 	 )
 
     (unless (and (processp p) (eq (process-status p) 'run)) (error "process %s died" command))
