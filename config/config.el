@@ -403,8 +403,9 @@ default value module is `this-load-file'
     (cdr (member dir l))
     )
   )
-; (config-ancestors "c:/home/a/emacs/config/hosts/granite/keys.el")
-; (config-ancestors "c:/home/a/emacs/config/os/w32/keys.el")
+; (config-ancestors "~/emacs/config/hosts/granite/keys.el")
+; (config-ancestors "~/emacs/config/os/w32/keys.el")
+; (locate-file "keys" load-path '(".el" ".elc"))
 
 (defun find-config-parent (&optional module)
   " visit the immediate parent of MODULE
@@ -421,9 +422,10 @@ if there is a choice between compiled and source versions of the parent, prefer 
         parent
     )
   )
-; (find-config-parent "c:/home/a/emacs/config/hosts/granite/keys.el")
-; (find-config-parent "c:/home/a/emacs/config/hosts/granite/post-xz.el")
-; (find-config-parent "c:/home/a/emacs/config/os/w32/keys.el")
+; (find-config-parent "~/emacs/config/hosts/granite/keys.el")
+; (find-config-parent "~/emacs/config/hosts/granite/post-xz.el")
+; (find-config-parent "~/emacs/config/os/w32/keys.el")
+; (locate-dominating-file FILE NAME)
 
 (defun visit-config-parent (&optional module)
   (let ((parent (find-file module) ))
