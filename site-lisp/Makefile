@@ -33,9 +33,9 @@ ship: compile autoloads pkglisp
 
 pkglisp: FORCE
 	rm -rf $(PKGLISP)
-	mkdir -p $(PKGLISP)
+	install -d $(PKGLISP)
 	install -m 444 $(TARGETS) $(PKGLISP)
-	mkdir -p $(SITESTART)
+	install -d $(SITESTART)
 	install -m 444 $(AUTOLOADS) $(SITESTART)
 
 autoloads: FORCE
