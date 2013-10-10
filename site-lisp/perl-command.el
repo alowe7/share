@@ -7,7 +7,7 @@
 
 (defconst *semicolon* (read "?;"))
 
-(defvar *perl-command* "perl")
+(defvar *perl-command* (executable-find "perl"))
 (defvar *perl-stdout* " *stdout*")
 (defvar *stderr* nil)
 (defmacro stderr ()
@@ -20,6 +20,7 @@ does not create a file.
 ; (assert (string= (stderr) *stderr*))
 
 
+; TBD resolve this with excutable-find
 (defun find-script (s &optional processor l)
   (interactive "sscript: ")
   "find SCRIPT using optional PROCESSOR along optional PATH
