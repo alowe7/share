@@ -10,6 +10,7 @@
 
 (defun find-defs (filelist compiled)
   "produce a list of all definitions that might be autoloaded from files"
+
   (let* ((dir (car filelist))
 	 (files (cadr filelist)))
 
@@ -33,7 +34,13 @@
   )
 
 (defun emit-autoloads (top prefix filelist compiled)
-  "produce an expression that when evaluated causes the definitions in files to be autoloaded
+  "produce an expression that when evaluated causes the definitions in specified filelist to be autoloaded
+
+required arguments are
+TOP the directory to autoload from
+PREFIX a unique package name
+FILELIST a list of (directory (relative filenames)) to scan
+COMPILED t if autoload is to come from a compiled file
 " 
 
   (let* ((top (if (string-match "/$" top) top (concat top "/")))
@@ -72,6 +79,8 @@
 ; (find-files-1 "/src/emacs" ".el$")
 
 (defun find-files (dir &optional full match predicate)
+  "returns a list with car DIR and cdr the list of files under dir specified relatively
+"
   (let ((default-directory dir))
     (list dir
 	  (find-files-1 "." match predicate))
@@ -133,10 +142,12 @@
   )
 ; (make-config-autoloads "/src/emacs" nil "config" t)
 
-(defun make-autoloads (dir top prefix &optional compiled sourcepath)
-  (let 
+(defun make-autoloads (dir top prefix &optional compiled sourcepath &rest filelist)
+
+  (let*
       ((file (concat prefix "-autoloads"))
-       (autoloads (emit-autoloads (or top dir) prefix (find-files dir nil ".el$") compiled)))
+       (filelist (list dir filelist))
+       (autoloads (emit-autoloads (or top dir) prefix (or filelist (find-files dir nil ".el$")) compiled)))
 
     (write-region "" nil file nil 'quiet)
 
@@ -154,8 +165,9 @@
     )
   )
 
-; (make-autoloads "/src/emacs/lisp" nil "a")
+; (let ((default-directory "/src/emacs/lisp")) (make-autoloads "/src/emacs/lisp" nil "a"))
 ; (make-autoloads "/src/xz/site-lisp" "/usr/share/emacs/site-lisp/xz-4.0/" "xz" t t)
+; (let ((default-directory "/z/el")) (make-autoloads  "/z/el" "/usr/share/site-lisp/z-1.0/" "z" t t "doom.el" "conf-mode.el" "camel.el" "outlook-helpers.el" "wget.el" "doclist.el" "collections.el"))
 
 ;; example 
 ;; emacs --batch --load="make-autoloads.el" --eval "(make-config-autoloads \"/src/emacs\" nil \"config\" t)"
