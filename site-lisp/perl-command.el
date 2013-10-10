@@ -5,11 +5,13 @@
 (require 'cl)
 (require 'eval-process)
 
-(defconst *semicolon* (read "?;"))
+(defvar *perl-command* (executable-find "perl") "where to find perl executable")
+(unless (file-executable-p  *perl-command*) (error "perl executable not found: %s" *perl-command*))
 
-(defvar *perl-command* (executable-find "perl"))
 (defvar *perl-stdout* " *stdout*")
+
 (defvar *stderr* nil)
+
 (defmacro stderr ()
   "generate a temp filename to use for stderr using `make-temp-name'
 sets `*stderr*' by side effect so contents can be examined
