@@ -14,12 +14,20 @@
   )
 ; (eval-python-process script args)
 
+(defun* pipe-string-to-python-process (stuff script &rest args)
+  "send STUFF via stdin to python script with optional args
+returns output from command, if any
+"
+
+  (apply 'pipe-string-to-process `(,stuff ,*python-command* ,script ,@args))
+  )
+
 (defun* pipe-string-to-process (stuff command &rest args)
   "send STUFF via stdin to COMMAND with optional args
 returns output from command, if any
 "
 
-  (when *python-log-command* (message "%s %s" command (mapconcat 'identity args " ")))
+  (when *python-log-command* (message "%s %s [%s]" command (mapconcat 'identity args " ") stuff))
 
   (let* (
 	 (bname (concat command "-pipe-buffer"))
