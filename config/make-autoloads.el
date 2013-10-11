@@ -146,7 +146,7 @@ COMPILED t if autoload is to come from a compiled file
 
   (let*
       ((file (concat prefix "-autoloads"))
-       (filelist (list dir filelist))
+       (filelist (and filelist (list dir filelist)))
        (autoloads (emit-autoloads (or top dir) prefix (or filelist (find-files dir nil ".el$")) compiled)))
 
     (write-region "" nil file nil 'quiet)
@@ -165,7 +165,7 @@ COMPILED t if autoload is to come from a compiled file
     )
   )
 
-; (let ((default-directory "/src/emacs/lisp")) (make-autoloads "/src/emacs/lisp" nil "a"))
+; (let ((default-directory "/src/emacs")) (make-autoloads "/src/emacs" nil "a"))
 ; (make-autoloads "/src/xz/site-lisp" "/usr/share/emacs/site-lisp/xz-4.0/" "xz" t t)
 ; (let ((default-directory "/z/el")) (make-autoloads  "/z/el" "/usr/share/site-lisp/z-1.0/" "z" t t "doom.el" "conf-mode.el" "camel.el" "outlook-helpers.el" "wget.el" "doclist.el" "collections.el"))
 
