@@ -35,18 +35,17 @@ if LIST is specified, it is used instead of default PATH
   (let (l (s* (expand-file-name (substitute-in-file-name s))))
     (cond 
      ((file-exists-p s*) s*)
-     (t (let ((default-directory (expand-file-name "/" (getenv "HOMEDRIVE")))
-	      (l (or l (getenv "PATH"))))
-	  (loop for x in (mapcar 'expand-file-name (split l path-separator))
+     (t (let ((default-directory (expand-file-name (getenv "HOMEDRIVE"))))
+	  (loop for x in exec-path
 		with cript = nil
-		when (and (file-exists-p (setq cript (concat x "/" s)))
+		when (and (file-exists-p (setq cript (expand-file-name s x)))
 			  (or (not processor)
 			      (string-match processor (eval-process "head" "-1" cript))))
 		return cript)))
      )
     )
   )
-
+; (find-script "pod2text")
 
 (defun get-buffer-create-1 (bn &optional dir)
   (let ((b (get-buffer-create bn)))
