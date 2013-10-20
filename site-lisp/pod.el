@@ -7,6 +7,7 @@
 ; functions to facilitate using pod from emacs
 
 (defvar *pod2text* (find-script "pod2text"))
+(unless (and *pod2text* (file-exists-p *pod2text*)) (error "pod2text script not found"))
 
 (defun pod2text (f &optional buffer)
   "find pod for FILE in optional BUFFER"
