@@ -4,6 +4,7 @@
 (require 'typesafe)
 (require 'trim)
 (require 'cat-utils)
+(require 'cl)
 
 ;; sh -- bain-damaged interpreter for shell scripts
 
@@ -66,8 +67,9 @@ with optional second arg LIST-ONLY, returns the vars that changed, but do not se
   (let* (
 	 (before (sort (split (eval-shell-command "bash -c 'env'")) 'string-lessp))
 	 (after (sort (split (eval-shell-command (format "bash -c '(. %s; env)'" fn))) 'string-lessp))
-	 (diff (mapcar (function (lambda (x) (split x "="))) (cl-set-difference after before :test 'string=)))
+	 (diff (mapcar (function (lambda (x) (split x "="))) (set-difference after before :test 'string=)))
 	 )
+
     (unless list-only 
       (mapc (function (lambda (x) (apply 'setenv x))) diff))
     diff
