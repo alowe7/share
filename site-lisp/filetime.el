@@ -19,6 +19,10 @@ see `file-attributes'
   )
 ; (fileacctime "filetime.el")
 
+; ugh.  TBD obsolete
+; see time-less-p in time-date.el
+; I guess I've written a lot of code that is redundant with some packages
+
 (defun compare-filetime (a b)
   "compare file times A and B.
  returns -1 if A preceeds B, 0 if they're equal, 1 otherwise 
