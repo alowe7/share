@@ -37,5 +37,5 @@ compile: FORCE
 ifeq ($(strip $(EMACS)),)
 	@echo "EMACS not found"
 else
-	$(EMACS) --batch -e batch-byte-compile $(CONFIGS)
+	$(EMACS) --batch -l byte-compile-directory.el -e batch-byte-compile-if-not-done $(CONFIGS)
 endif
