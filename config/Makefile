@@ -14,7 +14,7 @@ EMACS := $(shell which emacs  2> /dev/null)
 .PHONY: FORCE
 
 # everything in this directory is shippable
-CONFIGS=config.el make-autoloads.el
+CONFIGS=config.el config-lib.el make-autoloads.el
 CONFIGINIT=config-init.el
 
 CONFIGTARGETS := $(CONFIGS:.el=.elc)
