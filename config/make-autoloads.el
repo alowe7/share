@@ -3,6 +3,8 @@
 
  (eval-when-compile (require 'cl))
 
+(require 'config-lib)
+
 ; this is a rewrite of make-autoloads from perl
 
 ; (defvar *autoload-definition-list* '(defun defun* defmacro define-derived-mode fset *defalias autoload))
@@ -99,8 +101,8 @@ COMPILED t if autoload is to come from a compiled file
 	 (sysname (getenv "OS"))
 	 (hostname (or (getenv "HOSTNAME") (getenv "COMPUTERNAME")))
 	 (common-pattern "common")
-	 (os-pattern (format "os\\(/%s\\|$\\)" (if (string-match "Windows_NT" sysname) "W32" sysname)))
-	 (host-pattern (format "hosts\\(/%s\\|$\\)" hostname))
+	 (os-pattern (format "/os\\(/%s\\|$\\)" (if (string-match "Windows_NT" sysname) "W32" sysname)))
+	 (host-pattern (format "/hosts\\(/%s\\|$\\)" hostname))
 	 (emacs-version-pattern (format "%d" emacs-major-version))
 	 (emacs-minor-version-pattern (format "%d.%d" emacs-major-version emacs-minor-version))
 	 )
@@ -118,7 +120,7 @@ COMPILED t if autoload is to come from a compiled file
     )
   )
 
-; (setq foo (find-config-files "/src/emacs" nil ".el$") )
+; (describe-expression (find-config-files "/src/emacs/config" nil ".el$") )
 
 (defun make-config-autoloads (dir top prefix &optional compiled sourcepath)
   (let 
@@ -140,7 +142,7 @@ COMPILED t if autoload is to come from a compiled file
     file
     )
   )
-; (make-config-autoloads "/src/emacs" nil "config" t)
+; (make-config-autoloads "/src/emacs/config" nil "config" t)
 
 (defun make-autoloads (dir top prefix &optional compiled sourcepath &rest filelist)
 
