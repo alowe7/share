@@ -12,7 +12,7 @@
 (defun ctl (c) (+ *ctl* c))
 
 ; maybe the flag key
-(defconst *meta* (dec "0x800000"))
+(defconst *meta* (dec "0x8000000"))
 (defun meta (c) (+ *meta* c))
 
 (provide 'ctl-meta)

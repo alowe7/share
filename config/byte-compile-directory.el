@@ -1,5 +1,5 @@
 (put 'byte-compile-directory 'rcsid 
- "$Id: byte-compile-directory.el 1084 2013-09-09 17:59:41Z alowe $")
+ "$Id$")
 
 (defvar *share* (expand-file-name (or (getenv "SHARE") "/usr/share/emacs")))
 
