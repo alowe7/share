@@ -569,7 +569,8 @@ with optional prefix arg, dired containing directory
     (let* (
 	   (completion-list
 	    (mapcar (function (lambda (x) (list (file-name-nondirectory x) x))) (split (eval-process "find" *host-config-dir* "-type" "f") "\n")))
-	   (thing (cadr (assoc (completing-read* "visit host config file (%s): " completion-list *last-host-config-thing* '(nil t)) completion-list))))
+	   (thing1 (completing-read* "visit host config file (%s): " completion-list *last-host-config-thing* '(nil t)))
+	   (thing (or (cadr (assoc thing1 completion-list)) thing1)))
       thing)))
 
   (let* ((thing (expand-file-name thing *host-config-dir*)))
