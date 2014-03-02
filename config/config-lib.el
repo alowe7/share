@@ -566,14 +566,13 @@ with optional prefix arg, dired containing directory
 
   (interactive
    (list
-    (let* (
-	   (completion-list
+    (let* ((completion-list
 	    (mapcar (function (lambda (x) (list (file-name-nondirectory x) x))) (split (eval-process "find" *host-config-dir* "-type" "f") "\n")))
 	   (thing1 (completing-read* "visit host config file (%s): " completion-list *last-host-config-thing* '(nil t)))
 	   (thing (or (cadr (assoc thing1 completion-list)) thing1)))
       thing)))
 
-  (let* ((thing (expand-file-name thing *host-config-dir*)))
+  (let* ((thing (and thing (expand-file-name thing *host-config-dir*))))
 
     (cond 
      ((null thing) (dired *host-config-dir*))
@@ -589,8 +588,7 @@ with optional prefix arg, dired containing directory
 (defun host-bin ()
   (interactive)
   "find shell bin dir"
-  (let* ((host-config (host-config))
-	 (dir (and host-config (expand-file-name "bin" host-config))))
+  (let* ((dir (expand-file-name "bin" *host-config-dir*)))
     (cond
      ((and (interactive-p) (file-directory-p dir))
       (dired dir))
@@ -602,6 +600,7 @@ with optional prefix arg, dired containing directory
   )
 ; (call-interactively 'host-bin)
 ; (host-bin)
+(add-to-list 'exec-path (host-bin))
 
 (provide 'config-lib)
 
