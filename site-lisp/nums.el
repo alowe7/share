@@ -115,7 +115,7 @@ with arg, prompt for number.
 	  (setq s "")
 	(setq s (substring s 2 (length s))))
       )
-    (message ns)
+    (if (called-interactively-p 'any) (message ns) ns)
     )
   )
 
