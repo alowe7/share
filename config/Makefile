@@ -28,7 +28,7 @@ ship: compile init
 	install -m 444 $(CONFIGINIT) $(SITESTART)
 
 init: FORCE
-	@echo "(add-to-list 'find-function-source-path \"$(PWD)\")" > $(CONFIGINIT)
+	@echo -e "(require 'find-func)\n(add-to-list 'find-function-source-path \"$(PWD)\")" > $(CONFIGINIT)
 
 clean: FORCE
 	rm -f *.elc config-init.el
